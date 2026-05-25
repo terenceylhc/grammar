@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文法解析：關係子句</title>
+    <style>
+        body {
+            font-family: 'Chalkboard SE', 'Microsoft JhengHei', sans-serif;
+            background-color: #f7f4eb;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 30px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: white;
+            border: 3px solid #1a1a1a;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 6px 6px 0px #1a1a1a;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            text-shadow: 2px 2px 0px #ffd54f;
+        }
+        .back-link {
+            text-decoration: none;
+            color: #0288d1;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .grammar-box {
+            background-color: #fafafa;
+            border: 2px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .antecedent { text-decoration: underline; font-weight: bold; }
+        .relative-clause { background-color: #fff59d; padding: 2px 5px; border-radius: 4px; }
+        
+        /* 遊戲按鈕區 */
+        .game-zone {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            border-top: 2px dashed #ccc;
+            padding-top: 25px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+        .btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 14pt;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            color: #1a1a1a;
+            border: 3px solid #1a1a1a;
+            border-radius: 12px;
+            box-shadow: 4px 4px 0px #1a1a1a;
+        }
+        .btn-teacher { background-color: #ffcdd2; }
+        .btn-student { background-color: #c8e6c9; }
+        .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px #1a1a1a; }
+        .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #1a1a1a; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="index.html" class="back-link">⬅ 回到文法首頁</a>
+        <h1>🔮 關係子句 (主格用法)</h1>
+        
+        <div class="grammar-box">
+            <h3>核心概念解析：</h3>
+            <p>1. <strong>關係子句：</strong> 由關係代名詞引導的子句，放在先行詞 (N) 後面作修飾。特別是 N 不夠明確時，需要關係子句來細加說明。</p>
+            <p>2. <strong>who、which、that</strong> 為「關係代名詞」，代替前面的 N，並連接後面的子句。</p>
+            
+            <hr style="border: 1px dashed #ccc; margin: 20px 0;">
+            
+            <h3>講義核心經典例句：</h3>
+            <p>💡 <em>(請觀察底線與黃底的對應修飾關係)</em></p>
+            <ol style="line-height: 2; font-size: 13pt;">
+                <li>Andrew lost <span class="antecedent">the hat</span> <span class="relative-clause">which was given by Sharon</span>.</li>
+                <li><span class="antecedent">A crowd of people</span> <span class="relative-clause">who gathered in the square</span> were there for the event.</li>
+                <li>My mom likes to watch <span class="antecedent">dramas</span> <span class="relative-clause">that talk about family matters</span>.</li>
+            </ol>
+        </div>
+
+        <div class="game-zone">
+            <h3>🎮 進入連線教室互動小工具</h3>
+            <p style="color: #666; margin: 0 0 10px 0;">老師開啟大螢幕端建立房間，學生使用平板開啟學生端輸入房號連線操作！</p>
+            <div class="btn-group">
+                <a href="relatea.html" class="btn btn-teacher">🖥️ 我是老師 (大螢幕端)</a>
+                <a href="relastu.html" class="btn btn-student">📱 我是學生 (平板控制器)</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
