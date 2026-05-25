@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>關係子句魔法教室 - 大螢幕端</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <style>
+        body {
+            font-family: 'Chalkboard SE', 'Microsoft JhengHei', sans-serif;
+            background-color: #f7f4eb;
+            color: #1a1a1a;
+            margin: 0;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        .header {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            border: 3px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 15px 30px;
+            box-shadow: 5px 5px 0px #1a1a1a;
+        }
+        .room-code-tag {
+            font-size: 24pt;
+            font-weight: bold;
+            background: #ffd54f;
+            padding: 8px 20px;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+        }
+        .main-board {
+            width: 100%;
+            max-width: 1100px;
+            background: white;
+            border: 3px solid #1a1a1a;
+            border-radius: 16px;
+            box-shadow: 6px 6px 0px #1a1a1a;
+            margin-top: 25px;
+            padding: 40px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .sentence-area {
+            font-size: 28pt;
+            line-height: 2;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            text-align: center;
+        }
+        .antecedent {
+            border-bottom: 4px dashed #e57373;
+            padding: 0 6px;
+            font-weight: bold;
+            background-color: rgba(229, 115, 115, 0.08);
+        }
+        .slot {
+            width: 160px;
+            height: 65px;
+            border: 4px dashed #4fc3f7;
+            border-radius: 10px;
+            background: #e1f5fe;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18pt;
+            color: #0288d1;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .slot.success {
+            width: auto;
+            height: auto;
+            border: 3px solid #fbc02d;
+            background-color: #fff59d;
+            color: #1a1a1a;
+            padding: 5px 15px;
+            border-radius: 6px;
+        }
+        .sync-card {
+            position: absolute;
+            padding: 12px 24px;
+            font-size: 18pt;
+            font-weight: bold;
+            border: 3px solid #1a1a1a;
+            border-radius: 12px;
+            box-shadow: 4px 4px 0px #1a1a1a;
+            background-color: white;
+            transition: left 0.1s linear, top 0.1s linear;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .sync-card .owner-tag {
+            font-size: 10pt;
+            background: #1a1a1a;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 4px;
+        }
+        .student-list {
+            margin-top: 20px;
+            font-size: 14pt;
+            color: #666;
+        }
+        .btn {
+            background: #ffd54f;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 12px 30px;
+            font-size: 14pt;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px #1a1a1a;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2 style="margin:0;">✨ 關係子句互動大螢幕端 ✨</h2>
+        <div class="room-code-tag" id="room-display">房間號碼：生成中...</div>
+    </div>
+
+    <div class="main-board" id="board">
+        <div id="sentence-display" class="sentence-area"></div>
+    </div>
+
+    <div class="student-list" id="students-log">等待學生進入教室...</div>
+    <button class="btn" id="next-btn" style="display:none;">下一題 ➔</button>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDOyninxSDT04q1-L3FPWciybdfnJowIwE",
+            authDomain: "fire-gamebase.firebaseapp.com",
+            databaseURL: "https://fire-gamebase-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "fire-gamebase",
+            storageBucket: "fire-gamebase.firebasestorage.app",
+            messagingSenderId: "35029879593",
+            appId: "1:35029879593:web:26a7810d1363a72920c538"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const roomCode = Math.floor(1000 + Math.random() * 9000).toString();
+        document.getElementById('room-display').innerText = `教室房號：${roomCode}`;
+
+        const quizData = [
+            { id: 0, before: "Andrew lost ", antecedent: "the hat", clause: "was given by Sharon.", type: "thing", ans: ["which", "that"] },
+            { id: 1, before: "A crowd of people ", antecedent: "who gathered in the square", after: " were there for the event.", clause: "", type: "person", isSpecial: true },
+            { id: 2, before: "My mom likes to watch ", antecedent: "dramas", clause: "talk about family matters.", type: "thing", ans: ["which", "that"] }
+        ];
+        
+        let currentIdx = 0;
+        const roomRef = database.ref('classrooms/' + roomCode);
+
+        roomRef.set({ currentQuestion: currentIdx, answered: false, winner: "" });
+
+        function renderQuestion(idx) {
+            const quiz = quizData[idx];
+            const display = document.getElementById('sentence-display');
+            display.innerHTML = '';
+
+            if(quiz.isSpecial) {
+                display.innerHTML = `<span>A crowd of people </span><span class="slot success">who gathered in the square</span><span> were there for the event.</span>`;
+                document.getElementById('next-btn').style.display = 'block';
+                return;
+            }
+
+            const beforeSpan = document.createElement('span');
+            beforeSpan.innerText = quiz.before;
+            const anteSpan = document.createElement('span');
+            anteSpan.className = 'antecedent';
+            anteSpan.innerText = quiz.antecedent;
+            const slotDiv = document.createElement('div');
+            slotDiv.className = 'slot';
+            slotDiv.id = 'target-slot';
+            slotDiv.innerText = '？';
+
+            display.appendChild(beforeSpan);
+            display.appendChild(anteSpan);
+            display.appendChild(slotDiv);
+            document.getElementById('next-btn').style.display = 'none';
+        }
+
+        renderQuestion(currentIdx);
+
+        const board = document.getElementById('board');
+        roomRef.child('students').on('value', (snapshot) => {
+            const students = snapshot.val();
+            if (!students) return;
+
+            const names = Object.keys(students).map(k => students[k].name);
+            document.getElementById('students-log').innerText = `已連線學生：${names.join(', ')}`;
+
+            Object.keys(students).forEach(id => {
+                const data = students[id];
+                let cardEl = document.getElementById('card-' + id);
+
+                if (!cardEl && data.isDragging) {
+                    cardEl = document.createElement('div');
+                    cardEl.id = 'card-' + id;
+                    cardEl.className = 'sync-card';
+                    board.appendChild(cardEl);
+                }
+
+                if (cardEl) {
+                    if (data.isDragging) {
+                        cardEl.style.display = 'flex';
+                        cardEl.style.left = data.x + 'px';
+                        cardEl.style.top = data.y + 'px';
+                        cardEl.innerHTML = `<span>${data.card === 'who' ? '👤' : data.card === 'which' ? '👜' : '⭐'} ${data.card}</span><span class="owner-tag">${data.name}</span>`;
+                        cardEl.style.backgroundColor = data.card === 'who' ? '#ffcdd2' : data.card === 'which' ? '#c8e6c9' : '#e1bee7';
+                    } else {
+                        cardEl.style.display = 'none';
+                    }
+                }
+
+                if (data.success && !quizData[currentIdx].isSpecial) {
+                    const slot = document.getElementById('target-slot');
+                    if (slot && !slot.classList.contains('success')) {
+                        slot.className = 'slot success';
+                        slot.innerText = `${data.card} ${quizData[currentIdx].clause}`;
+                        roomRef.update({ answered: true, winner: data.name });
+                        document.getElementById('next-btn').style.display = 'block';
+                    }
+                }
+            });
+        });
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            currentIdx++;
+            if(currentIdx < quizData.length) {
+                roomRef.update({ currentQuestion: currentIdx, answered: false, winner: "" });
+                roomRef.child('students').once('value', snap => {
+                    const students = snap.val();
+                    if(students) {
+                        Object.keys(students).forEach(k => {
+                            roomRef.child('students/' + k).update({ success: false, isDragging: false });
+                        });
+                    }
+                });
+                renderQuestion(currentIdx);
+            } else {
+                document.getElementById('sentence-display').innerHTML = "🏆 全數通關！全班完美掌握主格關係代名詞結構！";
+                document.getElementById('next-btn').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
