@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>關係子句魔法控制器</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background-color: #f7f4eb;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+            touch-action: none;
+        }
+        .login-box, .game-box {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border: 3px solid #1a1a1a;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 4px 4px 0px #1a1a1a;
+            margin-top: 20px;
+            text-align: center;
+        }
+        input {
+            width: 80%;
+            padding: 12px;
+            font-size: 14pt;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .btn {
+            background: #ffd54f;
+            border: 2px solid #1a1a1a;
+            border-radius: 8px;
+            padding: 12px 30px;
+            font-size: 14pt;
+            font-weight: bold;
+            width: 85%;
+        }
+        .pad-area {
+            background: #fafafa;
+            border: 2px dashed #ccc;
+            height: 250px;
+            position: relative;
+            margin-top: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .card {
+            width: 100px;
+            padding: 15px 0;
+            font-size: 16pt;
+            font-weight: bold;
+            border: 3px solid #1a1a1a;
+            border-radius: 12px;
+            position: absolute;
+            background: white;
+            box-shadow: 3px 3px 0 #1a1a1a;
+            cursor: grab;
+            text-align: center;
+        }
+        #who { background: #ffcdd2; left: 30px; top: 80px; }
+        #which { background: #c8e6c9; left: 180px; top: 80px; }
+        #that { background: #e1bee7; left: 330px; top: 80px; }
+        .status-msg {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-top: 15px;
+            min-height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-box" id="login-ui">
+        <h2>✨ 魔法卡控制器登入 ✨</h2>
+        <input type="number" id="room-input" placeholder="請輸入4位數教室房號">
+        <input type="text" id="name-input" placeholder="請輸入您的座號或姓名">
+        <button class="btn" id="join-btn">連線進入教室 ➔</button>
+    </div>
+
+    <div class="game-box" id="game-ui" style="display:none;">
+        <h3 id="welcome-msg">準備就緒</h3>
+        <p style="color: #666;">請用手指將下方的卡片往上拖曳「發射」到大螢幕！</p>
+        
+        <div class="pad-area" id="pad">
+            <div class="card" id="who" data-val="who">👤 who</div>
+            <div class="card" id="which" data-val="which">👜 which</div>
+            <div class="card" id="that" data-val="that">⭐ that</div>
+        </div>
+        <div class="status-msg" id="msg"></div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDOyninxSDT04q1-L3FPWciybdfnJowIwE",
+            authDomain: "fire-gamebase.firebaseapp.com",
+            databaseURL: "https://fire-gamebase-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "fire-gamebase",
+            storageBucket: "fire-gamebase.firebasestorage.app",
+            messagingSenderId: "35029879593",
+            appId: "1:35029879593:web:26a7810d1363a72920c538"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let studentId = "st_" + Math.floor(Math.random() * 100000);
+        let sName = "";
+        let roomCode = "";
+        let studentRef = null;
+        let currentQuizAns = [];
+
+        const quizAnsKey = [
+            ["which", "that"],
+            ["who"],
+            ["which", "that"]
+        ];
+
+        document.getElementById('join-btn').addEventListener('click', () => {
+            roomCode = document.getElementById('room-input').value;
+            sName = document.getElementById('name-input').value;
+
+            if(!roomCode || !sName) { alert('請完整填寫房號與姓名！'); return; }
+
+            const roomCheckRef = database.ref('classrooms/' + roomCode);
+            roomCheckRef.once('value', (snapshot) => {
+                if(!snapshot.exists()) {
+                    alert('找不到此教室，請確認房號是否正確！');
+                } else {
+                    document.getElementById('login-ui').style.display = 'none';
+                    document.getElementById('game-ui').style.display = 'block';
+                    document.getElementById('welcome-msg').innerText = `同學：${sName} (房號: ${roomCode})`;
+                    
+                    studentRef = database.ref(`classrooms/${roomCode}/students/${studentId}`);
+                    studentRef.set({ name: sName, x: 0, y: 0, isDragging: false, card: "", success: false });
+
+                    roomCheckRef.child('currentQuestion').on('value', (snap) => {
+                        const qIdx = snap.val() || 0;
+                        currentQuizAns = quizAnsKey[qIdx];
+                        resetCards();
+                        document.getElementById('msg').innerText = "";
+                    });
+
+                    roomCheckRef.on('value', snap => {
+                        const data = snap.val();
+                        if (data && data.answered) {
+                            document.getElementById('msg').innerText = `🎉 這一題已被 ${data.winner} 答對囉！`;
+                        }
+                    });
+
+                    initTouchControls();
+                }
+            });
+        });
+
+        function resetCards() {
+            const who = document.getElementById('who');
+            const which = document.getElementById('which');
+            const that = document.getElementById('that');
+            who.style.left = "30px"; who.style.top = "80px";
+            which.style.left = "180px"; which.style.top = "80px";
+            that.style.left = "330px"; that.style.top = "80px";
+        }
+
+        function initTouchControls() {
+            const cards = document.querySelectorAll('.card');
+            const pad = document.getElementById('pad');
+
+            cards.forEach(card => {
+                let startX = 0, startY = 0;
+
+                card.addEventListener('touchstart', (e) => {
+                    const touch = e.touches[0];
+                    startX = touch.clientX - card.offsetLeft;
+                    startY = touch.clientY - card.offsetTop;
+                    studentRef.update({ isDragging: true, card: card.getAttribute('data-val') });
+                });
+
+                card.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    let newX = touch.clientX - startX;
+                    let newY = touch.clientY - startY;
+
+                    if(newX < 0) newX = 0;
+                    if(newY < 0) newY = 0;
+                    if(newX > pad.clientWidth - card.clientWidth) newX = pad.clientWidth - card.clientWidth;
+                    if(newY > pad.clientHeight - card.clientHeight) newY = pad.clientHeight - card.clientHeight;
+
+                    card.style.left = newX + 'px';
+                    card.style.top = newY + 'px';
+
+                    studentRef.update({
+                        x: newX * 2.2 + 50, 
+                        y: newY * 1.2 + 100
+                    });
+                });
+
+                card.addEventListener('touchend', () => {
+                    const val = card.getAttribute('data-val');
+                    if (parseInt(card.style.top) < 40) {
+                        if (currentQuizAns.includes(val)) {
+                            studentRef.update({ success: true, isDragging: false });
+                            document.getElementById('msg').innerText = "❤️ 答對了！太厲害了！";
+                        } else {
+                            document.getElementById('msg').style.color = '#d32f2f';
+                            document.getElementById('msg').innerText = "❌ 關代屬性選錯囉，再想想看！";
+                            setTimeout(() => { document.getElementById('msg').innerText = ""; }, 2000);
+                            resetCards();
+                            studentRef.update({ isDragging: false });
+                        }
+                    } else {
+                        resetCards();
+                        studentRef.update({ isDragging: false });
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
