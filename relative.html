@@ -24,7 +24,7 @@
         .antecedent { text-decoration: underline; font-weight: bold; }
         .relative-clause { background-color: #fff59d; padding: 2px 5px; border-radius: 4px; }
         
-        /* 2. 中：全新改良版動態句子合併示範黑板 */
+        /* 2. 中：動態句子合併示範黑板 */
         .teaching-board {
             background-color: #263238; border: 4px solid #1a1a1a; border-radius: 12px;
             padding: 25px; margin-bottom: 30px; box-shadow: 4px 4px 0px #1a1a1a; color: white;
@@ -32,17 +32,15 @@
         .teaching-board h3 { margin-top: 0; color: #ffd54f; border-bottom: 1px dashed #546e7a; padding-bottom: 8px; margin-bottom: 15px; }
         .guide-tip { color: #ce93d8; font-size: 11pt; margin: -5px 0 15px 0; font-weight: bold; }
         
-        /* 預設兩行之上下鐵軌托盤 */
         .board-line {
             display: flex; gap: 12px; align-items: center; padding: 12px 20px;
             min-height: 70px; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box;
         }
-        #line-a { background: #37474f; border: 2px dashed #4fc3f7; } /* 第一行主要句子軌道 */
-        #line-b { background: #2d3d45; border: 2px dashed #ff8a80; } /* 第二行次要句子軌道 */
+        #line-a { background: #37474f; border: 2px dashed #4fc3f7; } 
+        #line-b { background: #2d3d45; border: 2px dashed #ff8a80; } 
         
         .line-label { font-size: 11pt; font-weight: bold; background: #1a1a1a; color: #b0bec5; padding: 4px 8px; border-radius: 4px; min-width: 75px; text-align: center; user-select: none; }
         
-        /* 磁鐵字塊樣式 */
         .block-token {
             padding: 10px 16px; font-size: 14pt; font-weight: bold; color: #1a1a1a;
             background: #fffde7; border: 2px solid #1a1a1a; border-radius: 6px;
@@ -51,8 +49,6 @@
         .block-token:active { cursor: grabbing; }
         .block-token.clause-style { background-color: #fff59d; border-color: #fbc02d; }
         .block-token.pronoun-style { background-color: #ffcdd2; cursor: pointer; } 
-        
-        /* 當成功合併，先行詞亮起手繪紅色雙底線襯托 */
         .block-token.success-target { border-bottom: 5px double #e57373 !important; background-color: #ffebee; }
 
         /* 3. 下：進入競賽遊戲室入口 */
@@ -60,16 +56,27 @@
             display: flex; flex-direction: column; gap: 15px; align-items: center;
             border-top: 3px dashed #1a1a1a; padding-top: 25px; margin-top: 25px;
         }
-        .btn-group { display: flex; gap: 20px; width: 100%; max-width: 600px; }
+        .btn-group { display: flex; gap: 20px; width: 100%; max-width: 900px; justify-content: space-between; align-items: flex-start;}
+        .btn-wrapper { flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center;}
         .btn {
-            flex: 1; padding: 15px; font-size: 14pt; font-weight: bold; text-align: center;
+            width: 100%; padding: 15px; font-size: 14pt; font-weight: bold; text-align: center;
             text-decoration: none; color: #1a1a1a; border: 3px solid #1a1a1a; border-radius: 12px;
-            box-shadow: 4px 4px 0px #1a1a1a; transition: all 0.1s;
+            box-shadow: 4px 4px 0px #1a1a1a; transition: all 0.1s; display: block;
         }
         .btn-teacher { background-color: #ffcdd2; }
         .btn-student { background-color: #c8e6c9; }
         .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px #1a1a1a; }
         .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #1a1a1a; }
+        
+        /* 🌟 新增：QR code 容器樣式 */
+        .qr-wrapper {
+            background-color: white; border: 3px solid #1a1a1a; border-radius: 12px;
+            padding: 10px; margin-top: 15px; box-shadow: 3px 3px 0px #1a1a1a;
+            display: flex; justify-content: center; align-items: center; width: auto; max-width: 150px;
+        }
+        .qr-wrapper img { width: 100%; height: auto; display: block; }
+        .qr-text { font-size: 10pt; color: #555; margin-top: 5px; font-weight: bold;}
+        
     </style>
 </head>
 <body>
@@ -113,10 +120,19 @@
 
         <div class="game-zone">
             <h3 style="margin:0; font-size:16pt;">🎮 進入競賽遊戲室</h3>
-            <p style="color: #666; margin: 0 0 5px 0;">老師開啟大螢幕端建立房間，學生使用平板/手機開啟學生端輸入房號連線操作！</p>
+            <p style="color: #666; margin: 0 0 15px 0;">老師開啟大螢幕端建立房間，學生使用平板/手機開啟學生端輸入房號連線操作！</p>
             <div class="btn-group">
-                <a href="relatea.html" class="btn btn-teacher">🖥️ 我是老師 (大螢幕端)</a>
-                <a href="relastu.html" class="btn btn-student">📱 我是學生 (平板控制器)</a>
+                <div class="btn-wrapper">
+                    <a href="relatea.html" class="btn btn-teacher">🖥️ 我是老師 (大螢幕端)</a>
+                </div>
+                
+                <div class="btn-wrapper">
+                    <a href="relastu.html" class="btn btn-student">📱 我是學生 (平板控制器)</a>
+                    <div class="qr-wrapper">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://terenceylhc.github.io/grammar/relastu.html" alt="掃描加入學生端">
+                    </div>
+                    <div class="qr-text">📲 學生掃描加入</div>
+                </div>
             </div>
         </div>
     </div>
@@ -127,46 +143,37 @@
         const strawberriesToken = document.getElementById('token-strawberries');
         const cakeToken = document.getElementById('token-cake');
 
-        // 步驟 1：點擊 It 觸發魔法防錯轉化
         itToken.addEventListener('click', () => {
             if (!isTransformed) {
                 isTransformed = true;
                 itToken.innerText = "which / that";
-                itToken.className = "block-token clause-style"; // 變身為講義標準黃色關代字塊
-                strawberriesToken.className = "block-token clause-style"; // 關係子句其餘部分同步亮黃
-                
-                // 噴發小拉炮增加上課互動樂趣
+                itToken.className = "block-token clause-style";
+                strawberriesToken.className = "block-token clause-style";
                 confetti({ particleCount: 25, spread: 50, origin: { y: 0.5 } });
             }
         });
 
-        // 步驟 2：啟用跨行軌道磁鐵自由裝卸機能 (解鎖跨容器拖曳)
         const sortableOptions = {
-            group: 'shared-blackboard', // 核心：宣告為同一個群組，字塊才能跨行自由搬運！
+            group: 'shared-blackboard',
             animation: 180,
             ghostClass: 'sortable-ghost',
             onEnd: function () {
-                // 即時盤點第一行（Line A）目前的字塊串接順序
                 const currentOrder = Array.from(document.getElementById('line-a').children)
                                           .map(el => el.getAttribute('data-id'))
-                                          .filter(id => id !== null) // 過濾標籤方塊
+                                          .filter(id => id !== null)
                                           .join(',');
 
-                // 驗證是否排出了完美的高級插入句語順：The cake -> which -> had fresh strawberries -> was delicious.
                 if (currentOrder === "cake,it,strawberries,delicious") {
                     if (isTransformed) {
-                        // 完美合體：先行詞加上雙底線紅框，關係子句融合成完美的亮黃色區塊
                         cakeToken.classList.add('success-target');
                         confetti({ particleCount: 100, spread: 70, origin: { y: 0.5 } });
                     }
                 } else {
-                    // 若被移走，移除底線樣式恢復預設
                     cakeToken.classList.remove('success-target');
                 }
             }
         };
 
-        // 雙軌道同步喚醒
         new Sortable(document.getElementById('line-a'), sortableOptions);
         new Sortable(document.getElementById('line-b'), sortableOptions);
     </script>
