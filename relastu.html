@@ -19,18 +19,11 @@
         }
         .pad-area.flex-row { flex-direction: row; flex-wrap: wrap; }
         
-        /* 題型二專用單字 token */
         .word-token { padding: 8px 14px; font-size: 13pt; font-weight: bold; border: 2px solid #1a1a1a; border-radius: 8px; background: white; box-shadow: 2px 2px 0 #1a1a1a; cursor: pointer; }
         .word-token.selected { background-color: #fff59d; border-color: #fbc02d; transform: translate(1px, 1px); box-shadow: 1px 1px 0 #1a1a1a; }
-
-        /* 題型三專用大按鈕 */
         .clause-option-btn { width: 100%; padding: 15px 10px; font-size: 13pt; font-weight: bold; text-align: left; border: 3px solid #1a1a1a; border-radius: 12px; background: white; box-shadow: 3px 3px 0px #1a1a1a; cursor: pointer; box-sizing: border-box; }
-        
-        /* 題型四專用：磁鐵字塊樣式 */
         .sort-token { width: 100%; padding: 12px; font-size: 14pt; font-weight: bold; border: 2px solid #1a1a1a; border-radius: 8px; background: #fffde7; box-shadow: 3px 3px 0 #1a1a1a; cursor: grab; text-align: center; box-sizing: border-box;}
-        .sort-token:active { cursor: grabbing; }
-
-        /* 題型一卡片 */
+        
         .card-row { display: flex; gap: 15px; justify-content: center; width: 100%; }
         .card { width: 100px; padding: 15px 0; font-size: 14pt; font-weight: bold; border: 3px solid #1a1a1a; border-radius: 12px; background: white; box-shadow: 3px 3px 0 #1a1a1a; text-align: center; touch-action: none; }
         #who { background: #ffcdd2; } #which { background: #c8e6c9; } #that { background: #e1bee7; }
@@ -74,9 +67,7 @@
 
         let studentId = "st_" + Math.floor(Math.random() * 100000);
         let sName = ""; let roomCode = ""; let studentRef = null;
-        let myCurrentScore = 0; let hasScoredThisRound = false;
-        let targetAnsStr = ""; let currentTypeKey = "";
-        let sortableInstance = null;
+        let currentTypeKey = ""; let sortableInstance = null;
 
         document.getElementById('join-btn').addEventListener('click', () => {
             roomCode = document.getElementById('room-input').value;
@@ -93,12 +84,21 @@
                     studentRef = database.ref(`classrooms/${roomCode}/students/${studentId}`);
                     studentRef.set({ name: sName, x: 0, y: 0, isDragging: false, card: "", success: false, score: 0 });
 
+                    // 🚀 監聽個人分數節點：完全獨立，絕不受大螢幕重置影響
+                    studentRef.child('score').on('value', snap => {
+                        let scoreVal = snap.val() || 0;
+                        document.getElementById('my-score').innerText = `目前積分：${scoreVal} 分`;
+                    });
+
                     roomCheckRef.on('value', (snap) => {
                         const data = snap.val(); if(!data) return;
 
                         if (data.isStarted && !data.isEnded) {
                             targetAnsStr = data.currentAnsStr;
                             
+                            // 🚀 核心防撞安全鎖：如果切換空檔抓到空值，直接回傳守護畫面，絕對不跳回登入
+                            if (!data.currentAnsStr) return;
+
                             if (currentTypeKey !== data.currentQuestion + '_' + data.currentType) {
                                 currentTypeKey = data.currentQuestion + '_' + data.currentType;
                                 setupInterface(data.currentType, data.fullSentenceText, data.optionsStr);
@@ -111,20 +111,15 @@
                                 if (data.winner === sName) {
                                     document.getElementById('msg').style.color = '#2e7d32';
                                     document.getElementById('msg').innerText = "❤️ 搶答成功！獲得 10 分！";
-                                    if (!hasScoredThisRound) {
-                                        myCurrentScore += 10;
-                                        document.getElementById('my-score').innerText = `目前積分：${myCurrentScore} 分`;
-                                        studentRef.update({ score: myCurrentScore });
-                                        hasScoredThisRound = true;
-                                    }
                                 } else {
                                     document.getElementById('msg').style.color = '#666';
                                     document.getElementById('msg').innerText = `😱 被【${data.winner}】率先搶答走囉！`;
                                 }
                             } else {
-                                hasScoredThisRound = false; document.getElementById('msg').innerText = "";
+                                document.getElementById('msg').innerText = "";
                                 document.getElementById('submit-t2-btn').disabled = false;
-                                document.getElementById('pad').style.opacity = "1"; document.getElementById('pad').style.pointerEvents = "auto";
+                                document.getElementById('pad').style.opacity = "1";
+                                document.getElementById('pad').style.pointerEvents = "auto";
                             }
                         }
                         if (data.isEnded) {
@@ -142,8 +137,8 @@
             pad.className = 'pad-area'; pad.innerHTML = '';
             if(sortableInstance) { sortableInstance.destroy(); sortableInstance = null; }
 
-            if (type === 2) {
-                // 題型二：螢光筆劃記
+            // 🚀 RWD 防呆：如果資料庫切換空檔導致字串未載入，不進行渲染
+            if (type === 2 && fullText) {
                 pad.classList.add('flex-row');
                 document.getElementById('game-guide').innerText = "🎯 螢光筆任務：請點亮句子中「所有的關係子句單字」！";
                 submitBtn.style.display = 'block';
@@ -156,8 +151,7 @@
                     token.addEventListener('click', () => { token.classList.toggle('selected'); });
                     pad.appendChild(token);
                 });
-            } else if (type === 3) {
-                // 題型三：拆解大師三選一
+            } else if (type === 3 && optsStr) {
                 document.getElementById('game-guide').innerText = "🧩 文法思辨：請點擊最完整的關係子句發射！";
                 submitBtn.style.display = 'none';
 
@@ -174,26 +168,18 @@
                     });
                     pad.appendChild(optBtn);
                 });
-            } else if (type === 4) {
-                // 🌟 題型四：解鎖磁鐵字塊拖曳語順排序玩法
+            } else if (type === 4 && optsStr) {
                 document.getElementById('game-guide').innerText = "🧲 語順重組：請上下拖曳調換字塊，排出正確句子！";
                 submitBtn.style.display = 'block';
 
                 const tokens = optsStr.split('##');
-                // 洗牌亂序提供給學生
                 tokens.sort(() => Math.random() - 0.5);
-
                 tokens.forEach(tokText => {
-                    const block = document.createElement('div');
-                    block.className = 'sort-token';
-                    block.innerText = tokText;
+                    const block = document.createElement('div'); block.className = 'sort-token'; block.innerText = tokText;
                     pad.appendChild(block);
                 });
-
-                // 喚醒自動吸附排版模組
-                sortableInstance = new Sortable(pad, { animation: 150, ghostClass: 'blue-background-class' });
+                sortableInstance = new Sortable(pad, { animation: 150 });
             } else {
-                // 題型一
                 document.getElementById('game-guide').innerText = "🚀 請按住關代卡片向上發射至大螢幕！";
                 submitBtn.style.display = 'none';
                 const cardRow = document.createElement('div'); cardRow.className = 'card-row';
@@ -203,7 +189,6 @@
             }
         }
 
-        // 處理驗證提交（題型二、題型四共用）
         document.getElementById('submit-t2-btn').addEventListener('click', () => {
             if (currentTypeKey.endsWith('_2')) {
                 const selectedTokens = document.querySelectorAll('.word-token.selected');
@@ -211,19 +196,15 @@
                 if (selectedKeys.join(',') === targetAnsStr) { studentRef.update({ success: true }); } 
                 else { alertWrong(); }
             } else if (currentTypeKey.endsWith('_4')) {
-                // 抓取目前被排列出的卡片字塊順序
                 const sortedBlocks = document.querySelectorAll('.sort-token');
                 const studentOrder = Array.from(sortedBlocks).map(b => b.innerText).join(',');
-                
-                if (studentOrder === targetAnsStr) {
-                    studentRef.update({ success: true, card: studentOrder });
-                } else { alertWrong(); }
+                if (studentOrder === targetAnsStr) { studentRef.update({ success: true, card: studentOrder }); } 
+                else { alertWrong(); }
             }
         });
 
         function alertWrong() {
-            document.getElementById('msg').style.color = '#d32f2f';
-            document.getElementById('msg').innerText = "❌ 語順或範圍不正確，請再校對一下！";
+            document.getElementById('msg').style.color = '#d32f2f'; document.getElementById('msg').innerText = "❌ 語順或範圍不正確，請再校對一下！";
             setTimeout(() => { document.getElementById('msg').innerText = ""; }, 2000);
         }
 
