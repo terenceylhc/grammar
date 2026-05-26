@@ -9,100 +9,42 @@
     <style>
         body {
             font-family: 'Chalkboard SE', 'Microsoft JhengHei', sans-serif;
-            background-color: #f7f4eb;
-            color: #1a1a1a;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
+            background-color: #f7f4eb; color: #1a1a1a; margin: 0; padding: 20px;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden;
         }
         .header {
-            width: 100%;
-            max-width: 1100px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fff;
-            border: 3px solid #1a1a1a;
-            border-radius: 12px;
-            padding: 10px 25px;
-            box-shadow: 5px 5px 0px #1a1a1a;
+            width: 100%; max-width: 1100px; display: flex; justify-content: space-between; align-items: center;
+            background: #fff; border: 3px solid #1a1a1a; border-radius: 12px; padding: 10px 25px; box-shadow: 5px 5px 0px #1a1a1a;
         }
-        .room-code-tag {
-            font-size: 20pt;
-            font-weight: bold;
-            background: #ffd54f;
-            padding: 8px 20px;
-            border: 2px solid #1a1a1a;
-            border-radius: 8px;
-        }
+        .room-code-tag { font-size: 20pt; font-weight: bold; background: #ffd54f; padding: 8px 20px; border: 2px solid #1a1a1a; border-radius: 8px; }
         .main-board {
-            width: 100%;
-            max-width: 1100px;
-            background: white;
-            border: 3px solid #1a1a1a;
-            border-radius: 16px;
-            box-shadow: 6px 6px 0px #1a1a1a;
-            margin-top: 20px;
-            padding: 40px;
-            min-height: 380px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
+            width: 100%; max-width: 1100px; background: white; border: 3px solid #1a1a1a; border-radius: 16px;
+            box-shadow: 6px 6px 0px #1a1a1a; margin-top: 20px; padding: 40px; min-height: 380px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative;
         }
-        /* 設定面板樣式 */
-        .setup-panel {
-            width: 100%;
-            max-width: 600px;
-            text-align: left;
-        }
+        .setup-panel { width: 100%; max-width: 600px; text-align: left; }
         .setup-panel h3 { margin-top: 20px; border-bottom: 2px solid #1a1a1a; padding-bottom: 5px;}
         .checkbox-group { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
         .checkbox-label { font-size: 14pt; display: flex; align-items: center; gap: 10px; cursor: pointer; }
         .checkbox-label input { width: 20px; height: 20px; }
-        
-        /* 題目字體樣式 */
-        .sentence-area {
-            font-size: 26pt;
-            line-height: 2;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            text-align: center;
-        }
-        .antecedent {
-            border-bottom: 4px dashed #e57373;
-            padding: 0 6px;
-            font-weight: bold;
-            background-color: rgba(229, 115, 115, 0.08);
-        }
+        .sentence-area { font-size: 26pt; line-height: 2; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 15px; text-align: center; }
+        .antecedent { border-bottom: 4px dashed #e57373; padding: 0 6px; font-weight: bold; background-color: rgba(229, 115, 115, 0.08); }
         .slot-container { display: inline-flex; align-items: center; gap: 10px; }
         .slot {
             width: 140px; height: 65px; border: 4px dashed #4fc3f7; border-radius: 10px;
             background: #e1f5fe; display: inline-flex; justify-content: center; align-items: center;
             font-size: 18pt; color: #0288d1; font-weight: bold;
         }
-        .clause-skeleton {
-            font-size: 24pt; color: #a1a1a1; border: 2px dashed #ccc; padding: 2px 10px; border-radius: 8px; background: #fafafa;
-        }
+        .clause-skeleton { font-size: 24pt; color: #a1a1a1; border: 2px dashed #ccc; padding: 2px 10px; border-radius: 8px; background: #fafafa; }
         .slot.success {
             width: auto; height: auto; border: 3px solid #fbc02d; background-color: #fff59d;
             color: #1a1a1a; padding: 5px 15px; border-radius: 6px;
         }
-        /* 答對大標題 */
         .winner-banner {
-            font-size: 24pt; color: #2e7d32; font-weight: bold; margin-top: 20px;
+            font-size: 22pt; color: #2e7d32; font-weight: bold; margin-top: 20px;
             background: #e8f5e9; border: 2px solid #81c784; padding: 10px 30px; border-radius: 30px;
             display: none; animation: pop 0.3s ease-out;
         }
-        /* 學生即時飄移卡片 */
         .sync-card {
             position: absolute; padding: 10px 20px; font-size: 16pt; font-weight: bold;
             border: 3px solid #1a1a1a; border-radius: 12px; box-shadow: 4px 4px 0px #1a1a1a;
@@ -110,30 +52,18 @@
             pointer-events: none; display: flex; flex-direction: column; align-items: center; z-index: 99;
         }
         .sync-card .owner-tag { font-size: 9pt; background: #1a1a1a; color: white; padding: 1px 5px; border-radius: 4px; margin-top: 4px; }
-        
-        /* 底部即時計分板 */
         .scoreboard-zone {
             width: 100%; max-width: 1100px; background: #fff; border: 3px solid #1a1a1a;
             border-radius: 12px; margin-top: 20px; padding: 15px; box-shadow: 4px 4px 0px #1a1a1a;
             display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px;
         }
-        .score-pill {
-            font-size: 14pt; font-weight: bold; background: #f1f1f1; border: 2px solid #1a1a1a;
-            padding: 6px 15px; border-radius: 20px; min-width: 120px; text-align: center;
-        }
+        .score-pill { font-size: 14pt; font-weight: bold; background: #f1f1f1; border: 2px solid #1a1a1a; padding: 6px 15px; border-radius: 20px; min-width: 120px; text-align: center; }
         .score-pill.lead { background: #fff9c4; border-color: #fbc02d; }
-
-        /* 排行榜結算樣式 */
         .rank-table { width: 100%; max-width: 500px; border-collapse: collapse; margin-top: 20px; font-size: 16pt;}
         .rank-table th, .rank-table td { border: 2px solid #1a1a1a; padding: 12px; text-align: center; }
         .rank-table th { background: #ffd54f; }
-        .rank-table tr:nth-child(2) { background: #fff9c4; font-weight: bold; font-size: 18pt; } /* 第一名金黃色 */
-
-        .btn {
-            background: #ffd54f; border: 2px solid #1a1a1a; border-radius: 8px;
-            padding: 12px 35px; font-size: 14pt; font-weight: bold; cursor: pointer;
-            box-shadow: 3px 3px 0px #1a1a1a; margin-top: 20px;
-        }
+        .rank-table tr:nth-child(2) { background: #fff9c4; font-weight: bold; font-size: 18pt; }
+        .btn { background: #ffd54f; border: 2px solid #1a1a1a; border-radius: 8px; padding: 12px 35px; font-size: 14pt; font-weight: bold; cursor: pointer; box-shadow: 3px 3px 0px #1a1a1a; margin-top: 20px; }
         @keyframes pop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     </style>
 </head>
@@ -147,27 +77,24 @@
     <div class="main-board" id="board">
         <div class="setup-panel" id="setup-ui">
             <h2>⚙️ 課堂競賽設定</h2>
-            <p style="color: #666;">請老師先勾選本次比賽想抽出的題型，等學生都進入教室後即可點擊開始！</p>
-            
-            <h3>1. 勾選本次競賽題型：</h3>
+            <p style="color: #666;">勾選題目類型，系統將隨機由 90 題嚴選題庫中抽出 10 題進行競賽。</p>
             <div class="checkbox-group">
-                <label class="checkbox-label"><input type="checkbox" id="type-1" checked> 題型一：基礎關代填空 (who/which/that 基礎配對)</label>
-                <label class="checkbox-label"><input type="checkbox" id="type-2" checked> 題型二：尋找修飾標靶 (判斷後位修飾先行詞)</label>
-                <label class="checkbox-label"><input type="checkbox" id="type-3" checked> 題型三：高級句子大拆解 (兩句合併主格結構)</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-1" checked> 題型一：基礎關代填空 (共 30 題)</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-2" checked> 題型二：尋找修飾標靶 (共 30 題)</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-3" checked> 題型三：高級句子大拆解 (共 30 題)</label>
             </div>
-
-            <button class="btn" id="start-game-btn" style="width: 100%; margin-top: 10px;">🎲 隨機抽出 10 題・開始比賽！</button>
+            <button class="btn" id="start-game-btn" style="width: 100%;">🎲 隨機抽出 10 題・開始比賽！</button>
         </div>
 
-        <div id="game-play-ui" style="display:none; width:100%; text-align:center;">
+        <div class="game-play-ui" id="game-play-ui" style="display:none; width:100%; text-align:center;">
             <div style="font-size: 14pt; color: #888; margin-bottom: 15px;" id="q-progress">題目：0 / 10</div>
             <div id="sentence-display" class="sentence-area"></div>
-            <div class="winner-banner" id="winner-banner">🏆 恭喜組別搶答成功！</div>
+            <div class="winner-banner" id="winner-banner">🏆 搶答成功！</div>
         </div>
     </div>
 
     <div class="scoreboard-zone" id="scoreboard-ui">
-        <div style="color: #999; font-size: 12pt; width: 100%; text-align: center;">等待學生加入以同步計分板...</div>
+        <div style="color: #999; font-size: 12pt; width: 100%; text-align: center;">等待學生加入中...</div>
     </div>
 
     <button class="btn" id="next-btn" style="display:none;">下一題 ➔</button>
@@ -185,15 +112,13 @@
         
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-
         const roomCode = Math.floor(1000 + Math.random() * 9000).toString();
         document.getElementById('room-display').innerText = `教室房號：${roomCode}`;
-        
         const roomRef = database.ref('classrooms/' + roomCode);
 
-        // 🌟 30題超豐富完整題庫陣列 (完美覆蓋三大講義題型)
+        // 🌟 嚴格校對版：三大題型各 30 題，共 90 題黃金題庫
         const totalPool = [
-            // 題型一：基礎填空 (type: 1)
+            // === 題型一：基礎填空 (1-30) ===
             { type: 1, before: "Andrew lost ", antecedent: "the hat", clause: "was given by Sharon.", ans: ["which", "that"] },
             { type: 1, before: "My mom likes to watch ", antecedent: "dramas", clause: "talk about family matters.", ans: ["which", "that"] },
             { type: 1, before: "The boy ", antecedent: "the boy", after: " is my brother.", clause: "is standing by the door", ans: ["who", "that"], isEmbed: true },
@@ -201,49 +126,106 @@
             { type: 1, before: "The doctor ", antecedent: "the doctor", after: " was very kind.", clause: "treated my grandfather", ans: ["who", "that"], isEmbed: true },
             { type: 1, before: "They live in a house ", antecedent: "a house", clause: "is over one hundred years old.", ans: ["which", "that"] },
             { type: 1, before: "The singer ", antecedent: "the singer", after: " won the award.", clause: "sang the beautiful song", ans: ["who", "that"], isEmbed: true },
-            { type: 1, before: "He likes the car ", antecedent: "the car", clause: "runs on electricity.", ans: ["which", "that"] },
+            { type: 1, before: "He bought a new car ", antecedent: "a car", clause: "runs on electricity.", ans: ["which", "that"] },
             { type: 1, before: "The teacher ", antecedent: "the teacher", after: " comes from Canada.", clause: "teaches us English", ans: ["who", "that"], isEmbed: true },
             { type: 1, before: "Look at the dog ", antecedent: "the dog", clause: "is barking at the mailman.", ans: ["which", "that"] },
+            { type: 1, before: "The woman ", antecedent: "the woman", after: " is a famous lawyer.", clause: "lives next door", ans: ["who", "that"], isEmbed: true },
+            { type: 1, before: "The restaurant ", antecedent: "the restaurant", clause: "serves delicious pizza closed early.", ans: ["which", "that"] },
+            { type: 1, before: "I met a traveler ", antecedent: "a traveler", clause: "had just returned from Africa.", ans: ["who", "that"] },
+            { type: 1, before: "The movie ", antecedent: "the movie", after: " was very scary.", clause: "we watched last night", ans: ["which", "that"], isEmbed: true },
+            { type: 1, before: "The student ", antecedent: "the student", after: " got a perfect score.", clause: "studied the hardest", ans: ["who", "that"], isEmbed: true },
+            { type: 1, before: "Please return the laptop ", antecedent: "the laptop", clause: "belongs to the office.", ans: ["which", "that"] },
+            { type: 1, before: "The workers ", antecedent: "the workers", after: " demand higher wages.", clause: "built this tower", ans: ["who", "that"], isEmbed: true },
+            { type: 1, before: "The letters ", antecedent: "the letters", after: " arrived this morning.", clause: "were on the desk", ans: ["which", "that"], isEmbed: true },
+            { type: 1, before: "I don't like people ", antecedent: "people", clause: "tell lies to their friends.", ans: ["who", "that"] },
+            { type: 1, before: "The tree ", antecedent: "the tree", after: " blew down in the storm.", clause: "stood in front of the house", ans: ["which", "that"], isEmbed: true },
+            { type: 1, before: "The children ", antecedent: "the children", after: " are playing in the park.", clause: "live in this neighborhood", ans: ["who", "that"], isEmbed: true },
+            { type: 1, before: "She works for a company ", antecedent: "a company", clause: "makes medical equipment.", ans: ["which", "that"] },
+            { type: 1, before: "The jacket ", antecedent: "the jacket", after: " is made of leather.", clause: "is hanging in the closet", ans: ["which", "that"], isEmbed: true },
+            { type: 1, before: "The scientist ", antecedent: "the scientist", after: " gave an inspiring speech.", clause: "discovered the new virus", ans: ["who", "that"], isEmbed: true },
+            { type: 1, before: "He tells stories ", antecedent: "stories", clause: "sound completely unbelievable.", ans: ["which", "that"] },
+            { type: 1, before: "The river ", antecedent: "the river", after: " flows through the city is polluted.", clause: "runs behind the factory", ans: ["which", "that"], isEmbed: true },
+            { type: 1, before: "The bakery ", antecedent: "the bakery", clause: "sells traditional French bread is very popular.", ans: ["which", "that"] },
+            { type: 1, before: "The police arrested the thief ", antecedent: "the thief", clause: "stole the diamond ring.", ans: ["who", "that"] },
+            { type: 1, before: "The bus ", antecedent: "the bus", after: " was completely full.", clause: "goes to the airport", ans: ["which", "that"], isEmbed: true },
+            { type: 1, before: "The lady ", antecedent: "the lady", after: " waved hello to us.", clause: "was driving the red sports car", ans: ["who", "that"], isEmbed: true },
 
-            // 題型二：尋找修飾標靶 (type: 2)
-            { type: 2, before: "The woman ", antecedent: "who is listening to music", after: " is an actress.", clause: "", ans: ["who"] },
-            { type: 2, before: "A crowd of people ", antecedent: "who gathered in the square", after: " were there for the event.", clause: "", ans: ["who"] },
-            { type: 2, before: "I cannot find the keys ", antecedent: "which open the back door", after: ".", clause: "", ans: ["which"] },
-            { type: 2, before: "The students ", antecedent: "who passed the English exam", after: " felt very happy.", clause: "", ans: ["who"] },
-            { type: 2, before: "The multi-touch screen ", antecedent: "which was invented recently", after: " is amazing.", clause: "", ans: ["which"] },
-            { type: 2, before: "The dynamic computer ", antecedent: "that fits inside a pocket", after: " is called a smartphone.", clause: "", ans: ["that"] },
-            { type: 2, before: "Do you know the gentleman ", antecedent: "who is wearing a black suit", after: "?", clause: "", ans: ["who"] },
-            { type: 2, before: "The old library ", antecedent: "which stands on the hill", after: " will be rebuilt.", clause: "", ans: ["which"] },
-            { type: 2, before: "The cake ", antecedent: "that was made by my sister", after: " tasted sweet.", clause: "", ans: ["that"] },
-            { type: 2, before: "The monkeys ", antecedent: "which live in the mountain", after: " are very friendly.", clause: "", ans: ["which"] },
+            // === 題型二：標靶判斷 (31-60) ===
+            { type: 2, before: "The woman ", antecedent: "who is listening to music", after: " is an actress.", ans: ["who"] },
+            { type: 2, before: "A crowd of people ", antecedent: "who gathered in the square", after: " were there for the event.", ans: ["who"] },
+            { type: 2, before: "I cannot find the keys ", antecedent: "which open the back door", after: ".", ans: ["which"] },
+            { type: 2, before: "The students ", antecedent: "who passed the English exam", after: " felt very happy.", ans: ["who"] },
+            { type: 2, before: "The multi-touch screen ", antecedent: "which was invented recently", after: " is amazing.", ans: ["which"] },
+            { type: 2, before: "The dynamic computer ", antecedent: "that fits inside a pocket", after: " is called a smartphone.", ans: ["that"] },
+            { type: 2, before: "Do you know the gentleman ", antecedent: "who is wearing a black suit", after: "?", ans: ["who"] },
+            { type: 2, before: "The old library ", antecedent: "which stands on the hill", after: " will be rebuilt.", ans: ["which"] },
+            { type: 2, before: "The cake ", antecedent: "that was made by my sister", after: " tasted sweet.", ans: ["that"] },
+            { type: 2, before: "The monkeys ", antecedent: "which live in the mountain", after: " are very friendly.", ans: ["which"] },
+            { type: 2, before: "The report ", antecedent: "which was written by Tom", after: " contains many mistakes.", ans: ["which"] },
+            { type: 2, before: "The passengers ", antecedent: "who were injured in the accident", after: " were taken to the hospital.", ans: ["who"] },
+            { type: 2, before: "The store ", antecedent: "that sells organic food", after: " is always crowded.", ans: ["that"] },
+            { type: 2, before: "The artist ", antecedent: "who painted this beautiful mural", after: " is highly talented.", ans: ["who"] },
+            { type: 2, before: "The package ", antecedent: "which arrived yesterday afternoon", after: " was for my dad.", ans: ["which"] },
+            { type: 2, before: "The guard ", antecedent: "who stands at the gate", after: " checks everyone's ID.", ans: ["who"] },
+            { type: 2, before: "The fruits ", antecedent: "that grow on this tree", after: " are not safe to eat.", ans: ["that"] },
+            { type: 2, before: "The website ", antecedent: "which provides online courses", after: " is free for students.", ans: ["which"] },
+            { type: 2, before: "The actor ", antecedent: "who played the main character", after: " won an Oscar.", ans: ["who"] },
+            { type: 2, before: "The heavy rain ", antecedent: "that caused the flash flood", after: " lasted for three hours.", ans: ["that"] },
+            { type: 2, before: "The museum ", antecedent: "which displays ancient artifacts", after: " attracting many tourists.", ans: ["which"] },
+            { type: 2, before: "The teacher ", antecedent: "who coaches the basketball team", after: " is very strict.", ans: ["who"] },
+            { type: 2, before: "The machine ", antecedent: "that prints the labels", after: " is out of order.", ans: ["that"] },
+            { type: 2, before: "The flight ", antecedent: "which goes to New York", after: " has been delayed.", ans: ["which"] },
+            { type: 2, before: "The uniform ", antecedent: "that is worn by the staff", after: " looks very elegant.", ans: ["that"] },
+            { type: 2, before: "The man ", antecedent: "who fixed our air conditioner", after: " was very professional.", ans: ["who"] },
+            { type: 2, before: "The dog ", antecedent: "which won the competition", after: " is a golden retriever.", ans: ["which"] },
+            { type: 2, before: "The bridge ", antecedent: "that connects the two islands", after: " is made of steel.", ans: ["that"] },
+            { type: 2, before: "The woman ", antecedent: "who is sitting near the window", after: " looks lonely.", ans: ["who"] },
+            { type: 2, before: "The flowers ", antecedent: "which bloom in spring", after: " look absolutely beautiful.", ans: ["which"] },
 
-            // 題型三：高級句子大拆解/合併 (type: 3)
+            // === 題型三：句子合併大拆解 (61-90) ===
             { type: 3, before: "Combine: I know a girl. / She speaks four languages. ➔ I know a girl ", antecedent: "a girl", clause: "speaks four languages.", ans: ["who", "that"] },
             { type: 3, before: "Combine: This is the bus. / It goes to the train station. ➔ This is the bus ", antecedent: "the bus", clause: "goes to the train station.", ans: ["which", "that"] },
-            { type: 3, before: "Combine: The man is a famous chef. / He cooked the dinner. ➔ The man ", antecedent: "the man", after: " is a famous chef.", clause: "cooked the dinner", ans: ["who", "that"], isEmbed: true },
+            { type: 3, before: "Combine: The man is a chef. / He cooked dinner. ➔ The man ", antecedent: "the man", after: " is a famous chef.", clause: "cooked the dinner", ans: ["who", "that"], isEmbed: true },
             { type: 3, before: "Combine: The computer is expensive. / It belongs to Tom. ➔ The computer ", antecedent: "the computer", after: " is expensive.", clause: "belongs to Tom", ans: ["which", "that"], isEmbed: true },
             { type: 3, before: "Combine: We visited a museum. / It displayed ancient arts. ➔ We visited a museum ", antecedent: "a museum", clause: "displayed ancient arts.", ans: ["which", "that"] },
             { type: 3, before: "Combine: The girls are laughing. / They sit under the tree. ➔ The girls ", antecedent: "the girls", after: " are laughing.", clause: "sit under the tree", ans: ["who", "that"], isEmbed: true },
             { type: 3, before: "Combine: I like the movie. / It has a happy ending. ➔ I like the movie ", antecedent: "the movie", clause: "has a happy ending.", ans: ["which", "that"] },
             { type: 3, before: "Combine: The phone was broken. / It was on the table. ➔ The phone ", antecedent: "the phone", after: " was broken.", clause: "was on the table", ans: ["which", "that"], isEmbed: true },
             { type: 3, before: "Combine: The officer was helpful. / He answered my questions. ➔ The officer ", antecedent: "the officer", after: " was helpful.", clause: "answered my questions", ans: ["who", "that"], isEmbed: true },
-            { type: 3, before: "Combine: She has a cat. / It loves to sleep on the sofa. ➔ She has a cat ", antecedent: "a cat", clause: "loves to sleep on the sofa.", ans: ["which", "that"] }
+            { type: 3, before: "Combine: She has a cat. / It loves to sleep on the sofa. ➔ She has a cat ", antecedent: "a cat", clause: "loves to sleep on the sofa.", ans: ["which", "that"] },
+            { type: 3, before: "Combine: They met the author. / He wrote the best-selling book. ➔ They met the author ", antecedent: "the author", clause: "wrote the best-selling book.", ans: ["who", "that"] },
+            { type: 3, before: "Combine: The watch is a gift. / It is made of pure gold. ➔ The watch ", antecedent: "the watch", after: " is a gift from my uncle.", clause: "is made of pure gold", ans: ["which", "that"], isEmbed: true },
+            { type: 3, before: "Combine: The boy was praised. / He saved the drowning puppy. ➔ The boy ", antecedent: "the boy", after: " was praised by everyone.", clause: "saved the drowning puppy", ans: ["who", "that"], isEmbed: true },
+            { type: 3, before: "Combine: I live in an apartment. / It overlooks the central park. ➔ I live in an apartment ", antecedent: "an apartment", clause: "overlooks the central park.", ans: ["which", "that"] },
+            { type: 3, before: "Combine: The building was destroyed. / It stood here. ➔ The building ", antecedent: "the building", after: " was destroyed in the fire.", clause: "stood here", ans: ["which", "that"], isEmbed: true },
+            { type: 3, before: "Combine: The student won the scholarship. / She works hard. ➔ The student ", antecedent: "the student", after: " won the scholarship.", clause: "works hard", ans: ["who", "that"], isEmbed: true },
+            { type: 3, before: "Combine: This is the photo. / It reminds me of summer. ➔ This is the photo ", antecedent: "the photo", clause: "reminds me of summer vacation.", ans: ["which", "that"] },
+            { type: 3, before: "Combine: The firemen were brave. / They put out the fire. ➔ The firemen ", antecedent: "the firemen", after: " received a medal.", clause: "put out the dangerous fire", ans: ["who", "that"], isEmbed: true },
+            { type: 3, before: "Combine: He lost the wallet. / It contained his driver's license. ➔ He lost the wallet ", antecedent: "the wallet", clause: "contained his driver's license.", ans: ["which", "that"] },
+            { type: 3, before: "Combine: The cake was delicious. / It had fresh strawberries. ➔ The cake ", antecedent: "the cake", after: " was delicious.", clause: "had fresh strawberries on top", ans: ["which", "that"], isEmbed: true },
+            { type: 3, before: "Combine: I know the dentist. / He pulled out your tooth. ➔ I know the dentist ", antecedent: "the dentist", clause: "pulled out your wisdom tooth.", ans: ["who", "that"] },
+            { type: 3, before: "Combine: The shoes are tight. / I bought them yesterday. ➔ The shoes ", antecedent: "the shoes", after: " are tight.", clause: "were bought yesterday", ans: ["which", "that"], isEmbed: true },
+            { type: 3, before: "Combine: The people were friendly. / They welcomed us. ➔ The people ", antecedent: "the people", after: " were friendly.", clause: "welcomed us warmly", ans: ["who", "that"], isEmbed: true },
+            { type: 3, before: "Combine: The contract was signed. / It binds the two firms. ➔ The contract ", antecedent: "the contract", after: " was signed today.", clause: "binds the two firms together", ans: ["which", "that"], isEmbed: true },
+            { type: 3, before: "Combine: He adopted a puppy. / It has floppy brown ears. ➔ He adopted a puppy ", antecedent: "a puppy", clause: "has floppy brown ears.", ans: ["which", "that"] },
+            { type: 3, before: "Combine: The woman was polite. / She answered the telephone. ➔ The woman ", antecedent: "the woman", after: " was polite.", clause: "answered the telephone", ans: ["who", "that"], isEmbed: true },
+            { type: 3, before: "Combine: This is the map. / It shows the secret path. ➔ This is the map ", antecedent: "the map", clause: "shows the secret path to the cave.", ans: ["which", "that"] },
+            { type: 3, before: "Combine: The workers are tired. / They built the wall. ➔ The workers ", antecedent: "the workers", after: " are tired.", clause: "built the brick wall", ans: ["who", "that"], isEmbed: true },
+            { type: 3, before: "Combine: I want to see the painting. / It won first prize. ➔ I want to see the painting ", antecedent: "the painting", clause: "won first prize in the art show.", ans: ["which", "that"] },
+            { type: 3, before: "Combine: The lawyer represents our team. / She is wise. ➔ The lawyer ", antecedent: "the lawyer", after: " represents our team.", clause: "is wise and experienced", ans: ["who", "that"], isEmbed: true }
         ];
 
         let selectedQuizList = [];
         let currentIdx = 0;
         let globalScores = {}; 
 
-        // 初始化房間設定
-        roomRef.set({ isStarted: false, currentQuestion: 0, answered: false, winner: "" });
+        roomRef.set({ isStarted: false, currentQuestion: 0, answered: false, winner: "", currentAnsStr: "" });
 
-        // 點擊開始比賽按鈕
         document.getElementById('start-game-btn').addEventListener('click', () => {
             const allowT1 = document.getElementById('type-1').checked;
             const allowT2 = document.getElementById('type-2').checked;
             const allowT3 = document.getElementById('type-3').checked;
 
-            // 篩選題型
             let filteredPool = totalPool.filter(q => {
                 if (q.type === 1 && allowT1) return true;
                 if (q.type === 2 && allowT2) return true;
@@ -252,27 +234,30 @@
             });
 
             if (filteredPool.length < 10) {
-                alert(`符合條件的總題數只有 ${filteredPool.length} 題，不足 10 題！請多勾選一些題型。`);
+                alert(`符合條件的題數只有 ${filteredPool.length} 題，不足 10 題！請擴大勾選範圍。`);
                 return;
             }
 
-            // 洗牌並隨機抽出 10 題
             filteredPool.sort(() => Math.random() - 0.5);
             selectedQuizList = filteredPool.slice(0, 10);
 
-            // 隱藏設定面板，顯示遊戲面板
             document.getElementById('setup-ui').style.display = 'none';
             document.getElementById('game-play-ui').style.display = 'block';
 
-            // 同步 Firebase 房間狀態，通知學生端開始
-            roomRef.update({
-                isStarted: true,
-                currentQuestion: 0,
-                answered: false
-            });
-
+            syncQuestionToFirebase(0);
             renderQuestion(0);
         });
+
+        // 🚀 重點防錯修正：將正確答案字串串接同步到 Firebase，讓學生端同步核對
+        function syncQuestionToFirebase(idx) {
+            roomRef.update({
+                isStarted: true,
+                currentQuestion: idx,
+                answered: false,
+                winner: "",
+                currentAnsStr: selectedQuizList[idx].ans.join(',') // 將例如 ["which","that"] 轉為 "which,that"
+            });
+        }
 
         function renderQuestion(idx) {
             document.getElementById('winner-banner').style.display = 'none';
@@ -283,135 +268,63 @@
             const display = document.getElementById('sentence-display');
             display.innerHTML = '';
 
-            // 題型二（尋找修飾標靶）的渲染邏輯：直接列出包含關代的完整句子，挖空處改在先行詞
             if (quiz.type === 2) {
-                const beforeSpan = document.createElement('span');
-                beforeSpan.innerText = quiz.before;
-                
-                const slotDiv = document.createElement('div');
-                slotDiv.className = 'slot';
-                slotDiv.id = 'target-slot';
-                slotDiv.innerText = '？先行詞';
-                slotDiv.style.width = '200px';
-
-                const afterSpan = document.createElement('span');
-                afterSpan.className = 'clause-skeleton';
-                afterSpan.style.color = '#1a1a1a';
-                afterSpan.style.border = '2px solid #fbc02d';
-                afterSpan.style.backgroundColor = '#fff59d'; // 呼應講義黃底關係子句
-                afterSpan.innerText = quiz.antecedent + quiz.after;
-
-                display.appendChild(beforeSpan);
-                display.appendChild(slotDiv);
-                display.appendChild(afterSpan);
+                const beforeSpan = document.createElement('span'); beforeSpan.innerText = quiz.before;
+                const slotDiv = document.createElement('div'); slotDiv.className = 'slot'; slotDiv.id = 'target-slot'; slotDiv.innerText = '？先行詞'; slotDiv.style.width = '200px';
+                const afterSpan = document.createElement('span'); afterSpan.className = 'clause-skeleton'; afterSpan.style.color = '#1a1a1a'; afterSpan.style.border = '2px solid #fbc02d'; afterSpan.style.backgroundColor = '#fff59d';
+                afterSpan.innerText = quiz.antecedent + (quiz.after || '');
+                display.appendChild(beforeSpan); display.appendChild(slotDiv); display.appendChild(afterSpan);
                 return;
             }
 
-            // 題型一與題型三（填空與合併）的完整句子骨架化呈現
             if (quiz.isEmbed) {
-                const beforeSpan = document.createElement('span');
-                beforeSpan.className = 'antecedent';
-                beforeSpan.innerText = quiz.antecedent;
-                
-                const slotContainer = document.createElement('span');
-                slotContainer.className = 'slot-container';
-                slotContainer.id = 'interactive-container';
-                
-                const slotDiv = document.createElement('div');
-                slotDiv.className = 'slot';
-                slotDiv.id = 'target-slot';
-                slotDiv.innerText = '？';
-                
-                const skeletonSpan = document.createElement('span');
-                skeletonSpan.className = 'clause-skeleton';
-                skeletonSpan.innerText = quiz.clause;
-
-                const afterSpan = document.createElement('span');
-                afterSpan.innerText = quiz.after;
-
-                slotContainer.appendChild(slotDiv);
-                slotContainer.appendChild(skeletonSpan);
-
-                display.appendChild(beforeSpan);
-                display.appendChild(slotContainer);
-                display.appendChild(afterSpan);
+                const beforeSpan = document.createElement('span'); beforeSpan.className = 'antecedent'; beforeSpan.innerText = quiz.antecedent;
+                const slotContainer = document.createElement('span'); slotContainer.className = 'slot-container'; slotContainer.id = 'interactive-container';
+                const slotDiv = document.createElement('div'); slotDiv.className = 'slot'; slotDiv.id = 'target-slot'; slotDiv.innerText = '？';
+                const skeletonSpan = document.createElement('span'); skeletonSpan.className = 'clause-skeleton'; skeletonSpan.innerText = quiz.clause;
+                const afterSpan = document.createElement('span'); afterSpan.innerText = quiz.after;
+                slotContainer.appendChild(slotDiv); slotContainer.appendChild(skeletonSpan);
+                display.appendChild(beforeSpan); display.appendChild(slotContainer); display.appendChild(afterSpan);
             } else {
-                const beforeSpan = document.createElement('span');
-                beforeSpan.innerText = quiz.before;
-                
-                const anteSpan = document.createElement('span');
-                anteSpan.className = 'antecedent';
-                anteSpan.innerText = quiz.antecedent;
-                
-                const slotContainer = document.createElement('span');
-                slotContainer.className = 'slot-container';
-                slotContainer.id = 'interactive-container';
-                
-                const slotDiv = document.createElement('div');
-                slotDiv.className = 'slot';
-                slotDiv.id = 'target-slot';
-                slotDiv.innerText = '？';
-                
-                const skeletonSpan = document.createElement('span');
-                skeletonSpan.className = 'clause-skeleton';
-                skeletonSpan.innerText = quiz.clause;
-
-                slotContainer.appendChild(slotDiv);
-                slotContainer.appendChild(skeletonSpan);
-
-                display.appendChild(beforeSpan);
-                display.appendChild(anteSpan);
-                display.appendChild(slotContainer);
+                const beforeSpan = document.createElement('span'); beforeSpan.innerText = quiz.before;
+                const anteSpan = document.createElement('span'); anteSpan.className = 'antecedent'; anteSpan.innerText = quiz.antecedent;
+                const slotContainer = document.createElement('span'); slotContainer.className = 'slot-container'; slotContainer.id = 'interactive-container';
+                const slotDiv = document.createElement('div'); slotDiv.className = 'slot'; slotDiv.id = 'target-slot'; slotDiv.innerText = '？';
+                const skeletonSpan = document.createElement('span'); skeletonSpan.className = 'clause-skeleton'; skeletonSpan.innerText = quiz.clause;
+                slotContainer.appendChild(slotDiv); slotContainer.appendChild(skeletonSpan);
+                display.appendChild(beforeSpan); display.appendChild(anteSpan); display.appendChild(slotContainer);
             }
         }
 
-        // 監聽學生連線與即時操作
         const board = document.getElementById('board');
         roomRef.child('students').on('value', (snapshot) => {
             const students = snapshot.val();
             if (!students) return;
-
-            // 1. 計算即時積分板
             updateScoreboard(students);
 
-            // 2. 處理大螢幕滑鼠卡片同步殘影
             Object.keys(students).forEach(id => {
                 const data = students[id];
                 let cardEl = document.getElementById('card-' + id);
-
                 if (!cardEl && data.isDragging) {
-                    cardEl = document.createElement('div');
-                    cardEl.id = 'card-' + id;
-                    cardEl.className = 'sync-card';
-                    board.appendChild(cardEl);
+                    cardEl = document.createElement('div'); cardEl.id = 'card-' + id; cardEl.className = 'sync-card'; board.appendChild(cardEl);
                 }
-
                 if (cardEl) {
                     if (data.isDragging) {
-                        cardEl.style.display = 'flex';
-                        cardEl.style.left = data.x + 'px';
-                        cardEl.style.top = data.y + 'px';
+                        cardEl.style.display = 'flex'; cardEl.style.left = data.x + 'px'; cardEl.style.top = data.y + 'px';
                         cardEl.innerHTML = `<span>${data.card === 'who' ? '👤' : data.card === 'which' ? '👜' : '⭐'} ${data.card}</span><span class="owner-tag">${data.name}</span>`;
                         cardEl.style.backgroundColor = data.card === 'who' ? '#ffcdd2' : data.card === 'which' ? '#c8e6c9' : '#e1bee7';
-                    } else {
-                        cardEl.style.display = 'none';
-                    }
+                    } else { cardEl.style.display = 'none'; }
                 }
 
-                // 3. 有組別率先答對時的處理
                 if (data.success && selectedQuizList.length > 0) {
                     const quiz = selectedQuizList[currentIdx];
-                    
-                    // 題型二答對結算
                     if (quiz.type === 2) {
                         const slot = document.getElementById('target-slot');
                         if (slot && !slot.classList.contains('success')) {
-                            slot.className = 'slot success';
-                            slot.innerText = `[ ${quiz.before.trim() || '主詞'} ]`;
+                            slot.className = 'slot success'; slot.innerText = `[ ${quiz.before.trim() || '主詞'} ]`;
                             triggerWinner(data.name);
                         }
                     } else {
-                        // 題型一與三答對結算
                         const container = document.getElementById('interactive-container');
                         if (container && !container.classList.contains('combined')) {
                             container.classList.add('combined');
@@ -431,47 +344,28 @@
         }
 
         function updateScoreboard(students) {
-            const scZone = document.getElementById('scoreboard-ui');
-            scZone.innerHTML = '';
-
-            // 統計各組累計分數
+            const scZone = document.getElementById('scoreboard-ui'); scZone.innerHTML = '';
             let scores = {};
-            Object.keys(students).forEach(k => {
-                scores[students[k].name] = students[k].score || 0;
-            });
-            globalScores = scores; // 存入全域供結算用
-
+            Object.keys(students).forEach(k => { scores[students[k].name] = students[k].score || 0; });
+            globalScores = scores;
             let sorted = Object.keys(scores).sort((a,b) => scores[b] - scores[a]);
-            if(sorted.length === 0) {
-                scZone.innerHTML = `<div style="color: #999; font-size: 12pt; width: 100%; text-align: center;">等待學生登入中...</div>`;
-                return;
-            }
-
+            if(sorted.length === 0) { scZone.innerHTML = `<div style="color:#999;font-size:12pt;width:100%;text-align:center;">等待學生登入中...</div>`; return; }
             sorted.forEach((name, i) => {
-                const pill = document.createElement('div');
-                pill.className = `score-pill ${i === 0 ? 'lead' : ''}`;
-                pill.innerText = `${i === 0 ? '👑 ' : ''}${name}：${scores[name]} 分`;
-                scZone.appendChild(pill);
+                const pill = document.createElement('div'); pill.className = `score-pill ${i === 0 ? 'lead' : ''}`;
+                pill.innerText = `${i === 0 ? '👑 ' : ''}${name}：${scores[name]} 分`; scZone.appendChild(pill);
             });
         }
 
-        // 下一題按鈕點擊
         document.getElementById('next-btn').addEventListener('click', () => {
             currentIdx++;
             if (currentIdx < 10) {
-                roomRef.update({ currentQuestion: currentIdx, answered: false, winner: "" });
-                // 重設所有學生的本題成功狀態
+                syncQuestionToFirebase(currentIdx);
                 roomRef.child('students').once('value', snap => {
                     const students = snap.val();
-                    if(students) {
-                        Object.keys(students).forEach(k => {
-                            roomRef.child('students/' + k).update({ success: false, isDragging: false });
-                        });
-                    }
+                    if(students) { Object.keys(students).forEach(k => { roomRef.child('students/' + k).update({ success: false, isDragging: false }); }); }
                 });
                 renderQuestion(currentIdx);
             } else {
-                // 10 題全部結束，秀出最終頒獎排行榜
                 roomRef.update({ isEnded: true });
                 showFinalLeaderboard();
             }
@@ -481,34 +375,10 @@
             document.getElementById('next-btn').style.display = 'none';
             const display = document.getElementById('sentence-display');
             document.getElementById('q-progress').innerText = "🏁 競賽結束！最終成績結算排行";
-            
-            let html = `
-                <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
-                    <h2>🏆 關係子句魔法大賽・頒獎台 🏆</h2>
-                    <table class="rank-table">
-                        <thead>
-                            <tr>
-                                <th>名次</th>
-                                <th>組別 / 學生姓名</th>
-                                <th>總得分</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
+            let html = `<div style="display:flex;flex-direction:column;align-items:center;width:100%;"><h2>🏆 關係子句魔法大賽・頒獎台 🏆</h2><table class="rank-table"><thead><tr><th>名次</th><th>組別 / 學生姓名</th><th>總得分</th></tr></thead><tbody>`;
             let sorted = Object.keys(globalScores).sort((a,b) => globalScores[b] - globalScores[a]);
-            sorted.forEach((name, idx) => {
-                html += `
-                    <tr>
-                        <td>第 ${idx + 1} 名</td>
-                        <td>${name}</td>
-                        <td>${globalScores[name]} 分</td>
-                    </tr>
-                `;
-            });
-
-            html += `</tbody></table></div>`;
-            display.innerHTML = html;
+            sorted.forEach((name, idx) => { html += `<tr><td>第 ${idx + 1} 名</td><td>${name}</td><td>${globalScores[name]} 分</td></tr>`; });
+            html += `</tbody></table></div>`; display.innerHTML = html;
         }
     </script>
 </body>
