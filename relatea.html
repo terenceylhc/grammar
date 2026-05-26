@@ -116,9 +116,8 @@
         document.getElementById('room-display').innerText = `教室房號：${roomCode}`;
         const roomRef = database.ref('classrooms/' + roomCode);
 
-        // 🌟 嚴格校對版：三大題型各 30 題，共 90 題黃金題庫
         const totalPool = [
-            // === 題型一：基礎填空 (1-30) ===
+            // === 題型一：基礎填空 ===
             { type: 1, before: "Andrew lost ", antecedent: "the hat", clause: "was given by Sharon.", ans: ["which", "that"] },
             { type: 1, before: "My mom likes to watch ", antecedent: "dramas", clause: "talk about family matters.", ans: ["which", "that"] },
             { type: 1, before: "The boy ", antecedent: "the boy", after: " is my brother.", clause: "is standing by the door", ans: ["who", "that"], isEmbed: true },
@@ -150,7 +149,7 @@
             { type: 1, before: "The bus ", antecedent: "the bus", after: " was completely full.", clause: "goes to the airport", ans: ["which", "that"], isEmbed: true },
             { type: 1, before: "The lady ", antecedent: "the lady", after: " waved hello to us.", clause: "was driving the red sports car", ans: ["who", "that"], isEmbed: true },
 
-            // === 題型二：標靶判斷 (31-60) ===
+            // === 題型二：標靶判斷 ===
             { type: 2, before: "The woman ", antecedent: "who is listening to music", after: " is an actress.", ans: ["who"] },
             { type: 2, before: "A crowd of people ", antecedent: "who gathered in the square", after: " were there for the event.", ans: ["who"] },
             { type: 2, before: "I cannot find the keys ", antecedent: "which open the back door", after: ".", ans: ["which"] },
@@ -182,7 +181,7 @@
             { type: 2, before: "The woman ", antecedent: "who is sitting near the window", after: " looks lonely.", ans: ["who"] },
             { type: 2, before: "The flowers ", antecedent: "which bloom in spring", after: " look absolutely beautiful.", ans: ["which"] },
 
-            // === 題型三：句子合併大拆解 (61-90) ===
+            // === 題型三：句子合併大拆解 ===
             { type: 3, before: "Combine: I know a girl. / She speaks four languages. ➔ I know a girl ", antecedent: "a girl", clause: "speaks four languages.", ans: ["who", "that"] },
             { type: 3, before: "Combine: This is the bus. / It goes to the train station. ➔ This is the bus ", antecedent: "the bus", clause: "goes to the train station.", ans: ["which", "that"] },
             { type: 3, before: "Combine: The man is a chef. / He cooked dinner. ➔ The man ", antecedent: "the man", after: " is a famous chef.", clause: "cooked the dinner", ans: ["who", "that"], isEmbed: true },
@@ -248,14 +247,13 @@
             renderQuestion(0);
         });
 
-        // 🚀 重點防錯修正：將正確答案字串串接同步到 Firebase，讓學生端同步核對
         function syncQuestionToFirebase(idx) {
             roomRef.update({
                 isStarted: true,
                 currentQuestion: idx,
                 answered: false,
                 winner: "",
-                currentAnsStr: selectedQuizList[idx].ans.join(',') // 將例如 ["which","that"] 轉為 "which,that"
+                currentAnsStr: selectedQuizList[idx].ans.join(',')
             });
         }
 
@@ -356,13 +354,23 @@
             });
         }
 
+        // 🌟 重點修正：切換下一題時，只精準更新狀態，絕對不移除整個學生註冊節點！
         document.getElementById('next-btn').addEventListener('click', () => {
             currentIdx++;
             if (currentIdx < 10) {
                 syncQuestionToFirebase(currentIdx);
                 roomRef.child('students').once('value', snap => {
                     const students = snap.val();
-                    if(students) { Object.keys(students).forEach(k => { roomRef.child('students/' + k).update({ success: false, isDragging: false }); }); }
+                    if(students) { 
+                        Object.keys(students).forEach(k => { 
+                            // 改用精確路徑更新個別欄位，保留學生的登入狀態
+                            roomRef.child('students/' + k).update({ 
+                                success: false, 
+                                isDragging: false,
+                                card: ""
+                            }); 
+                        }); 
+                    }
                 });
                 renderQuestion(currentIdx);
             } else {
