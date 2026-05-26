@@ -40,7 +40,6 @@
         .slot-large { width: 450px; height: 65px; border: 4px dashed #81c784; background: #e8f5e9; color: #2e7d32; border-radius: 10px; display: inline-flex; justify-content: center; align-items: center; font-size: 16pt; font-weight: bold;}
         .clause-skeleton { font-size: 24pt; color: #a1a1a1; border: 2px dashed #ccc; padding: 2px 10px; border-radius: 8px; background: #fafafa; }
         
-        /* 答對時的黃底關係子句樣式 */
         .highlight-clause { background-color: #fff59d; border: 2px solid #fbc02d; padding: 2px 12px; border-radius: 8px; animation: pop 0.3s ease-out; }
         .slot.success { width: auto; height: auto; border: 3px solid #fbc02d; background-color: #fff59d; color: #1a1a1a; padding: 5px 15px; border-radius: 6px; }
         
@@ -64,13 +63,13 @@
 
     <div class="main-board" id="board">
         <div class="setup-panel" id="setup-ui">
-            <h2>⚙️ 課堂競賽設定 (120 題完全解鎖版)</h2>
-            <p style="color: #666;">勾選開啟題型，點擊後系統會從外掛晶片庫隨機調配 10 題進行多樣化競技！</p>
+            <h2>⚙️ 課堂競賽設定 (120 題防斷線計分修正版)</h2>
+            <p style="color: #666;">勾選開啟題型，系統將隨機由 `relaquizpool.js` 抽出 10 題進行競技。</p>
             <div class="checkbox-group">
-                <label class="checkbox-label"><input type="checkbox" id="type-1" checked> 題型一：基礎關代填空 (who/which/that卡片發射)</label>
-                <label class="checkbox-label"><input type="checkbox" id="type-2" checked> 題型二：尋找修飾標靶 (一字字點選螢光筆玩法)</label>
-                <label class="checkbox-label"><input type="checkbox" id="type-3" checked> 題型三：文法拆解大師 (整條關係子句三選一防錯版)</label>
-                <label class="checkbox-label"><input type="checkbox" id="type-4" checked> 題型四：高級排列組合 (磁鐵字塊語順大重組)</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-1" checked> 題型一：基礎關代填空</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-2" checked> 題型二：尋找修飾標靶 (螢光筆玩法)</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-3" checked> 題型三：文法拆解大師 (子句三選一)</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-4" checked> 題型四：高級排列組合 (磁鐵字塊重組)</label>
             </div>
             <button class="btn" id="start-game-btn" style="width: 100%;">🎲 隨機抽出 10 題・開始比賽！</button>
         </div>
@@ -108,6 +107,7 @@
         let selectedQuizList = [];
         let currentIdx = 0;
         let globalScores = {}; 
+        let isRoundSettled = false; // 防止單題重複加分安全鎖
 
         roomRef.set({ isStarted: false, currentQuestion: 0, answered: false, winner: "", currentAnsStr: "", currentType: 1, optionsStr: "", fullSentenceText: "" });
 
@@ -137,6 +137,7 @@
         });
 
         function syncQuestionToFirebase(idx) {
+            isRoundSettled = false;
             const quiz = selectedQuizList[idx];
             let ansStr = ""; let optsStr = ""; let rawText = "";
 
@@ -174,7 +175,6 @@
                 return;
             }
 
-            // 題型一
             if (quiz.isEmbed) {
                 display.innerHTML = `<span>${quiz.before}</span><span class="antecedent">${quiz.antecedent}</span><span class="slot-container" id="interactive-container"><div class="slot" id="target-slot">？</div><span class="clause-skeleton">${quiz.clause}</span></span><span>${quiz.after}</span>`;
             } else {
@@ -188,33 +188,36 @@
 
             Object.keys(students).forEach(id => {
                 const data = students[id];
-                if (data.success && selectedQuizList.length > 0) {
+                if (data.success && selectedQuizList.length > 0 && !isRoundSettled) {
+                    isRoundSettled = true; // 鎖定搶答
                     const quiz = selectedQuizList[currentIdx];
                     const slot = document.getElementById('target-slot');
                     
+                    // 🚀 核心漏洞修正：由大螢幕在全域端直接執行分數結算寫入，確保不會被下一題清空！
+                    let currentScore = data.score || 0;
+                    roomRef.child(`students/${id}`).update({ score: currentScore + 10 });
+
                     if (quiz.type === 2) {
                         const display = document.getElementById('game-play-ui').querySelector('.sentence-area');
-                        if (display && !display.querySelector('.highlight-clause')) {
+                        if (display) {
                             const targetWords = quiz.target.split(','); let finalHtml = quiz.full;
                             const clausePhrase = quiz.full.match(new RegExp(targetWords.join("[\\s,]+").replace(/[?.]/g, ""), "i"));
                             if (clausePhrase) { finalHtml = quiz.full.replace(clausePhrase[0], `<span class="highlight-clause">${clausePhrase[0]}</span>`); }
-                            display.innerHTML = finalHtml; triggerWinner(data.name);
+                            display.innerHTML = finalHtml; 
                         }
                     } else if (quiz.type === 4 || quiz.type === 3) {
-                        if (slot && !slot.classList.contains('success')) {
+                        if (slot) {
                             slot.className = "highlight-clause"; slot.style.fontSize = "24pt";
-                            // 將逗號轉為空格完美呈現給大螢幕
                             slot.innerText = quiz.type === 4 ? data.card.replace(/,/g, ' ') : data.card;
-                            triggerWinner(data.name);
                         }
                     } else {
                         const container = document.getElementById('interactive-container');
-                        if (container && !container.classList.contains('combined')) {
+                        if (container) {
                             container.classList.add('combined');
                             container.innerHTML = `<span class="slot success">${data.card} ${quiz.clause}</span>`;
-                            triggerWinner(data.name);
                         }
                     }
+                    triggerWinner(data.name);
                 }
             });
         });
