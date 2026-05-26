@@ -1,105 +1,42 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文法 Grammar 互動學習基地</title>
+    <title>AI 英文文法互動學習基地</title>
     <style>
         body {
-            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Microsoft JhengHei', sans-serif;
-            background-color: #f7f4eb;
-            color: #1a1a1a;
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            font-family: 'Chalkboard SE', 'Microsoft JhengHei', sans-serif;
+            background-color: #f7f4eb; color: #1a1a1a; margin: 0; padding: 30px 15px;
+            display: flex; flex-direction: column; align-items: center;
         }
         .container {
-            max-width: 800px;
-            width: 100%;
-            text-align: center;
+            max-width: 1000px; width: 100%; background: white; border: 3px solid #1a1a1a;
+            border-radius: 16px; padding: 30px; box-shadow: 6px 6px 0px #1a1a1a; box-sizing: border-box;
         }
-        h1 {
-            font-size: 32pt;
-            margin-bottom: 10px;
-            text-shadow: 3px 3px 0px #ffd54f;
+        h1 { text-align: center; margin-top: 0; text-shadow: 2px 2px 0px #ffd54f; font-size: 28pt; margin-bottom: 30px; }
+        
+        /* 🌟 全新一列一列的主題排版 */
+        .grammar-row {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #fafafa; border: 3px solid #1a1a1a; border-radius: 12px;
+            padding: 20px 25px; margin-bottom: 20px; box-shadow: 4px 4px 0px #1a1a1a;
+            gap: 20px; flex-wrap: wrap;
         }
-        .subtitle {
-            font-size: 14pt;
-            color: #666;
-            margin-bottom: 40px;
+        .row-info { flex: 1; min-width: 250px; }
+        .row-title { font-size: 18pt; font-weight: bold; margin: 0 0 5px 0; color: #1a1a1a; }
+        .row-desc { font-size: 11pt; color: #666; margin: 0; }
+        
+        /* 按鈕群組 */
+        .row-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn {
+            padding: 10px 20px; font-size: 11pt; font-weight: bold; text-align: center;
+            text-decoration: none; color: #1a1a1a; border: 2px solid #1a1a1a; border-radius: 8px;
+            box-shadow: 2px 2px 0px #1a1a1a; cursor: pointer; transition: all 0.1s;
         }
-        .menu-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 25px;
-        }
-        @media (min-width: 600px) {
-            .menu-grid { grid-template-columns: 1fr 1fr; }
-            .full-width { grid-column: span 2; }
-        }
-        .card {
-            background: white;
-            border: 3px solid #1a1a1a;
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 5px 5px 0px #1a1a1a;
-            text-decoration: none;
-            color: #1a1a1a;
-            transition: transform 0.1s, box-shadow 0.1s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .card:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 7px 7px 0px #1a1a1a;
-        }
-        .card:active {
-            transform: translate(2px, 2px);
-            box-shadow: 3px 3px 0px #1a1a1a;
-        }
-        .card h2 {
-            margin: 0 0 10px 0;
-            font-size: 18pt;
-        }
-        .card p {
-            margin: 0;
-            color: #555;
-            font-size: 11pt;
-        }
-        .g1 { background-color: #ffcdd2; }
-        .g2 { background-color: #c8e6c9; }
-        .g3 { background-color: #fff59d; } /* 關係子句亮黃色 */
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <h1>✨ 文法 Grammar ✨</h1>
-        <div class="subtitle">歡迎來到互動教學基地，請選擇要練習的文法單元：</div>
-
-        <div class="menu-grid">
-            <a href="https://gemini.google.com/share/8e80c56a0ad5" target="_blank" class="card g1">
-                <h2>🎁 授予動詞小遊戲</h2>
-                <p>點擊開啟外部互動資源</p>
-            </a>
-
-            <a href="https://gemini.google.com/share/0c2a23dcf73e" target="_blank" class="card g2">
-                <h2>🤖 虛主詞 It的用法</h2>
-                <p>點擊開啟外部互動資源</p>
-            </a>
-
-            <a href="relative.html" class="card g3 full-width">
-                <h2>🔮 關係子句 (主格)</h2>
-                <p>包含文法重點解析與連線教室互動遊戲（老師端 / 學生端）</p>
-            </a>
-        </div>
-    </div>
-
-</body>
-</html>
+        .btn:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0px #1a1a1a; }
+        .btn:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0px #1a1a1a; }
+        
+        .btn-notes { background-color: #fff59d; } /* 講義黃 */
+        .btn-teacher { background-color: #ffcdd2; } /* 老師紅 */
+        .btn-student { background-color: #c8e6c9
