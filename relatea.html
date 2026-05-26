@@ -9,7 +9,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <script src="quizpool.js"></script>
+    <script src="relaquizpool.js"></script>
     <style>
         body {
             font-family: 'Chalkboard SE', 'Microsoft JhengHei', sans-serif;
@@ -58,6 +58,8 @@
         .rank-table tr:nth-child(2) { background: #fffde7; font-weight: bold; font-size: 19pt; color: #b78103; }
         
         .btn { background: #ffd54f; border: 2px solid #1a1a1a; border-radius: 8px; padding: 12px 35px; font-size: 14pt; font-weight: bold; cursor: pointer; box-shadow: 3px 3px 0px #1a1a1a; margin-top: 20px; }
+        .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #1a1a1a; }
+        .btn-home { background: #a5d6a7; margin-top: 25px; border-width: 3px; } /* 回首頁綠色按鈕 */
         @keyframes pop { 0% { transform: scale(0.95); } 100% { transform: scale(1); } }
     </style>
 </head>
@@ -233,7 +235,6 @@
             document.getElementById('winner-banner').style.display = 'block'; document.getElementById('next-btn').style.display = 'block';
             roomRef.update({ answered: true, winner: winnerName });
             
-            // 單題答對噴發微型小拉炮點綴
             confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0 } });
             confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1 } });
         }
@@ -264,43 +265,33 @@
             }
         });
 
-        // 🌟 新增：瀏覽器數學合成「全場溫馨大歡呼與拉炮聲」晶片技術 (免載外部音檔)
         function playCheersAudio() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // 1. 合成全場拍手鼓掌聲 (模擬粉紅噪音濾波)
                 for (let i = 0; i < 15; i++) {
                     setTimeout(() => {
-                        let osc = audioCtx.createOscillator();
-                        let gain = audioCtx.createGain();
-                        osc.type = 'triangle';
-                        osc.frequency.setValueAtTime(100 + Math.random() * 300, audioCtx.currentTime);
-                        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                        let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+                        osc.type = 'triangle'; osc.frequency.setValueAtTime(100 + Math.random() * 300, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
                         osc.connect(gain); gain.connect(audioCtx.destination);
                         osc.start(); osc.stop(audioCtx.currentTime + 0.4);
                     }, i * 80);
                 }
-
-                // 2. 合成熱烈的歡呼音高口哨聲
-                let oscMain = audioCtx.createOscillator();
-                let gainMain = audioCtx.createGain();
-                oscMain.type = 'sine';
-                oscMain.frequency.setValueAtTime(600, audioCtx.currentTime);
+                let oscMain = audioCtx.createOscillator(); let gainMain = audioCtx.createGain();
+                oscMain.type = 'sine'; oscMain.frequency.setValueAtTime(600, audioCtx.currentTime);
                 oscMain.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.3);
                 oscMain.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 1.5);
-                gainMain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gainMain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.8);
+                gainMain.gain.setValueAtTime(0.2, audioCtx.currentTime); gainMain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.8);
                 oscMain.connect(gainMain); gainMain.connect(audioCtx.destination);
                 oscMain.start(); oscMain.stop(audioCtx.currentTime + 1.8);
-
-            } catch (e) { console.log("音訊建立失敗，使用者尚未與網頁互動：", e); }
+            } catch (e) { console.log(e); }
         }
 
-        // 🌟 核心修正：結算大清點，並啟動全螢幕無限豪華拉炮與歡呼
         function showFinalLeaderboard() {
+            // 🚀 關鍵修復：進入結算畫面時，強制將「獲得10分」的獨立橫條設為隱藏 (none)
+            document.getElementById('winner-banner').style.display = 'none';
             document.getElementById('next-btn').style.display = 'none';
+            
             const display = document.getElementById('game-play-ui').querySelector('.sentence-area');
             document.getElementById('q-progress').innerText = "🏁 競賽結束！最終成績結算排行";
             
@@ -335,23 +326,21 @@
                              </tr>`;
                 });
                 
-                html += `</tbody></table></div>`;
+                html += `</tbody></table>`;
+                
+                // 🚀 新增功能：在表格最下方插入「回到文法主選單」的精美按鈕
+                html += `<button class="btn btn-home" onclick="window.location.href='index.html'">🏠 回到文法主選單</button></div>`;
+                
                 display.innerHTML = html;
 
-                // 🚀 觸發 A：播放全場高潮歡呼聲
                 playCheersAudio();
 
-                // 🚀 觸發 B：啟動「連續 4 秒全螢幕無限噴發拉炮」特效
                 let duration = 4 * 1000;
                 let end = Date.now() + duration;
-
                 (function frame() {
                     confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0, y: 0.8 } });
                     confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1, y: 0.8 } });
-
-                    if (Date.now() < end) {
-                        requestAnimationFrame(frame);
-                    }
+                    if (Date.now() < end) { requestAnimationFrame(frame); }
                 }());
             });
         }
