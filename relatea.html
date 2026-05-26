@@ -6,7 +6,10 @@
     <title>關係子句魔法教室 - 大螢幕競賽端</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    <script src="relaquizpool.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script src="quizpool.js"></script>
     <style>
         body {
             font-family: 'Chalkboard SE', 'Microsoft JhengHei', sans-serif;
@@ -48,10 +51,14 @@
         .scoreboard-zone { width: 100%; max-width: 1100px; background: #fff; border: 3px solid #1a1a1a; border-radius: 12px; margin-top: 20px; padding: 15px; box-shadow: 4px 4px 0px #1a1a1a; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; }
         .score-pill { font-size: 14pt; font-weight: bold; background: #f1f1f1; border: 2px solid #1a1a1a; padding: 6px 15px; border-radius: 20px; min-width: 120px; text-align: center; }
         .score-pill.lead { background: #fff9c4; border-color: #fbc02d; }
-        .rank-table { width: 100%; max-width: 500px; border-collapse: collapse; margin-top: 20px; font-size: 16pt;}
-        .rank-table th, .rank-table td { border: 2px solid #1a1a1a; padding: 12px; text-align: center; }
+        
+        .rank-table { width: 100%; max-width: 550px; border-collapse: collapse; margin-top: 25px; font-size: 16pt; box-shadow: 5px 5px 0px #1a1a1a; border: 3px solid #1a1a1a; border-radius: 12px; overflow: hidden; background: white;}
+        .rank-table th, .rank-table td { border: 2px solid #1a1a1a; padding: 14px; text-align: center; }
         .rank-table th { background: #ffd54f; }
+        .rank-table tr:nth-child(2) { background: #fffde7; font-weight: bold; font-size: 19pt; color: #b78103; }
+        
         .btn { background: #ffd54f; border: 2px solid #1a1a1a; border-radius: 8px; padding: 12px 35px; font-size: 14pt; font-weight: bold; cursor: pointer; box-shadow: 3px 3px 0px #1a1a1a; margin-top: 20px; }
+        @keyframes pop { 0% { transform: scale(0.95); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -63,13 +70,13 @@
 
     <div class="main-board" id="board">
         <div class="setup-panel" id="setup-ui">
-            <h2>⚙️ 課堂競賽設定 (120 題防斷線計分修正版)</h2>
-            <p style="color: #666;">勾選開啟題型，系統將隨機由 `relaquizpool.js` 抽出 10 題進行競技。</p>
+            <h2>⚙️ 課堂競賽設定 (120 題終極聲光慶賀版)</h2>
+            <p style="color: #666;">勾選開啟題型，點擊後系統會從外掛晶片庫隨機調配 10 題進行多樣化競技！</p>
             <div class="checkbox-group">
-                <label class="checkbox-label"><input type="checkbox" id="type-1" checked> 題型一：基礎關代填空</label>
-                <label class="checkbox-label"><input type="checkbox" id="type-2" checked> 題型二：尋找修飾標靶 (螢光筆玩法)</label>
-                <label class="checkbox-label"><input type="checkbox" id="type-3" checked> 題型三：文法拆解大師 (子句三選一)</label>
-                <label class="checkbox-label"><input type="checkbox" id="type-4" checked> 題型四：高級排列組合 (磁鐵字塊重組)</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-1" checked> 題型一：基礎關代填空 (who/which/that卡片發射)</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-2" checked> 題型二：尋找修飾標靶 (一字字點選螢光筆玩法)</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-3" checked> 題型三：文法拆解大師 (整條關係子句三選一防錯版)</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-4" checked> 題型四：高級排列組合 (磁鐵字塊語順大重組)</label>
             </div>
             <button class="btn" id="start-game-btn" style="width: 100%;">🎲 隨機抽出 10 題・開始比賽！</button>
         </div>
@@ -107,7 +114,7 @@
         let selectedQuizList = [];
         let currentIdx = 0;
         let globalScores = {}; 
-        let isRoundSettled = false; // 防止單題重複加分安全鎖
+        let isRoundSettled = false; 
 
         roomRef.set({ isStarted: false, currentQuestion: 0, answered: false, winner: "", currentAnsStr: "", currentType: 1, optionsStr: "", fullSentenceText: "" });
 
@@ -189,11 +196,10 @@
             Object.keys(students).forEach(id => {
                 const data = students[id];
                 if (data.success && selectedQuizList.length > 0 && !isRoundSettled) {
-                    isRoundSettled = true; // 鎖定搶答
+                    isRoundSettled = true; 
                     const quiz = selectedQuizList[currentIdx];
                     const slot = document.getElementById('target-slot');
                     
-                    // 🚀 核心漏洞修正：由大螢幕在全域端直接執行分數結算寫入，確保不會被下一題清空！
                     let currentScore = data.score || 0;
                     roomRef.child(`students/${id}`).update({ score: currentScore + 10 });
 
@@ -226,6 +232,10 @@
             document.getElementById('winner-banner').innerText = `🏆 搶答成功！恭喜【${winnerName}】獲得 10 分！`;
             document.getElementById('winner-banner').style.display = 'block'; document.getElementById('next-btn').style.display = 'block';
             roomRef.update({ answered: true, winner: winnerName });
+            
+            // 單題答對噴發微型小拉炮點綴
+            confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0 } });
+            confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1 } });
         }
 
         function updateScoreboard(students) {
@@ -248,16 +258,102 @@
                     if(students) { Object.keys(students).forEach(k => { roomRef.child('students/' + k).update({ success: false, card: "" }); }); }
                 });
                 renderQuestion(currentIdx);
-            } else { roomRef.update({ isEnded: true }); showFinalLeaderboard(); }
+            } else { 
+                roomRef.update({ isEnded: true }); 
+                showFinalLeaderboard(); 
+            }
         });
 
+        // 🌟 新增：瀏覽器數學合成「全場溫馨大歡呼與拉炮聲」晶片技術 (免載外部音檔)
+        function playCheersAudio() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // 1. 合成全場拍手鼓掌聲 (模擬粉紅噪音濾波)
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        let osc = audioCtx.createOscillator();
+                        let gain = audioCtx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(100 + Math.random() * 300, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                        osc.connect(gain); gain.connect(audioCtx.destination);
+                        osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+                    }, i * 80);
+                }
+
+                // 2. 合成熱烈的歡呼音高口哨聲
+                let oscMain = audioCtx.createOscillator();
+                let gainMain = audioCtx.createGain();
+                oscMain.type = 'sine';
+                oscMain.frequency.setValueAtTime(600, audioCtx.currentTime);
+                oscMain.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.3);
+                oscMain.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 1.5);
+                gainMain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gainMain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.8);
+                oscMain.connect(gainMain); gainMain.connect(audioCtx.destination);
+                oscMain.start(); oscMain.stop(audioCtx.currentTime + 1.8);
+
+            } catch (e) { console.log("音訊建立失敗，使用者尚未與網頁互動：", e); }
+        }
+
+        // 🌟 核心修正：結算大清點，並啟動全螢幕無限豪華拉炮與歡呼
         function showFinalLeaderboard() {
             document.getElementById('next-btn').style.display = 'none';
             const display = document.getElementById('game-play-ui').querySelector('.sentence-area');
-            let html = `<div style="display:flex;flex-direction:column;align-items:center;width:100%;"><h2>🏆 關係子句魔法大賽・頒獎台 🏆</h2><table class="rank-table"><thead><tr><th>名次</th><th>組別姓名</th><th>總得分</th></tr></thead><tbody>`;
-            let sorted = Object.keys(globalScores).sort((a,b) => globalScores[b] - globalScores[a]);
-            sorted.forEach((name, idx) => { html += `<tr><td>第 ${idx + 1} 名</td><td>${name}</td><td>${globalScores[name]} 分</td></tr>`; });
-            html += `</tbody></table></div>`; display.innerHTML = html;
+            document.getElementById('q-progress').innerText = "🏁 競賽結束！最終成績結算排行";
+            
+            roomRef.child('students').once('value', (snapshot) => {
+                const students = snapshot.val() || {};
+                let finalScores = {};
+                
+                Object.keys(students).forEach(k => {
+                    finalScores[students[k].name] = students[k].score || 0;
+                });
+                
+                let sorted = Object.keys(finalScores).sort((a, b) => finalScores[b] - finalScores[a]);
+                
+                let html = `<div style="display:flex;flex-direction:column;align-items:center;width:100%;">
+                                <h2>🏆 關係子句魔法大賽・頒獎台 🏆</h2>
+                                <table class="rank-table">
+                                    <thead>
+                                        <tr>
+                                            <th>名次</th>
+                                            <th>組別姓名</th>
+                                            <th>總得分</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+                                    
+                sorted.forEach((name, idx) => {
+                    let medal = idx === 0 ? '🥇 ' : (idx === 1 ? '🥈 ' : (idx === 2 ? '🥉 ' : ''));
+                    html += `<tr>
+                                <td>${medal}第 ${idx + 1} 名</td>
+                                <td><strong>${name}</strong></td>
+                                <td style="color:#d32f2f; font-weight:bold;">${finalScores[name]} 分</td>
+                             </tr>`;
+                });
+                
+                html += `</tbody></table></div>`;
+                display.innerHTML = html;
+
+                // 🚀 觸發 A：播放全場高潮歡呼聲
+                playCheersAudio();
+
+                // 🚀 觸發 B：啟動「連續 4 秒全螢幕無限噴發拉炮」特效
+                let duration = 4 * 1000;
+                let end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0, y: 0.8 } });
+                    confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1, y: 0.8 } });
+
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                }());
+            });
         }
     </script>
 </body>
