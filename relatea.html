@@ -59,7 +59,7 @@
         
         .btn { background: #ffd54f; border: 2px solid #1a1a1a; border-radius: 8px; padding: 12px 35px; font-size: 14pt; font-weight: bold; cursor: pointer; box-shadow: 3px 3px 0px #1a1a1a; margin-top: 20px; }
         .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #1a1a1a; }
-        .btn-home { background: #a5d6a7; margin-top: 25px; border-width: 3px; } /* 回首頁綠色按鈕 */
+        .btn-room { background: #b3e5fc; margin-top: 25px; border-width: 3px; color: #01579b; } /* 回遊戲室藍色按鈕 */
         @keyframes pop { 0% { transform: scale(0.95); } 100% { transform: scale(1); } }
     </style>
 </head>
@@ -72,7 +72,7 @@
 
     <div class="main-board" id="board">
         <div class="setup-panel" id="setup-ui">
-            <h2>⚙️ 課堂競賽設定 (120 題終極聲光慶賀版)</h2>
+            <h2>⚙️ 課堂競賽設定 (120 題跨回合積分版)</h2>
             <p style="color: #666;">勾選開啟題型，點擊後系統會從外掛晶片庫隨機調配 10 題進行多樣化競技！</p>
             <div class="checkbox-group">
                 <label class="checkbox-label"><input type="checkbox" id="type-1" checked> 題型一：基礎關代填空 (who/which/that卡片發射)</label>
@@ -118,6 +118,7 @@
         let globalScores = {}; 
         let isRoundSettled = false; 
 
+        // 初始化房間
         roomRef.set({ isStarted: false, currentQuestion: 0, answered: false, winner: "", currentAnsStr: "", currentType: 1, optionsStr: "", fullSentenceText: "" });
 
         document.getElementById('start-game-btn').addEventListener('click', () => {
@@ -141,6 +142,7 @@
             document.getElementById('setup-ui').style.display = 'none';
             document.getElementById('game-play-ui').style.display = 'block';
 
+            currentIdx = 0; // 重置題號索引
             syncQuestionToFirebase(0);
             renderQuestion(0);
         });
@@ -156,7 +158,7 @@
             else if (quiz.type === 4) { ansStr = quiz.ans; optsStr = quiz.tokens.join('##'); rawText = `${quiz.raw1} / ${quiz.raw2}`; }
 
             roomRef.update({
-                isStarted: true, currentQuestion: idx, answered: false, winner: "",
+                isStarted: true, isEnded: false, currentQuestion: idx, answered: false, winner: "",
                 currentType: quiz.type, currentAnsStr: ansStr, optionsStr: optsStr, fullSentenceText: rawText
             });
         }
@@ -287,8 +289,25 @@
             } catch (e) { console.log(e); }
         }
 
+        // 🌟 核心更新：清空當前結算、隱藏橫條、將大螢幕切回「設定面板」，並保留學生分數！
+        function resetToGameRoom() {
+            document.getElementById('game-play-ui').style.display = 'none';
+            document.getElementById('setup-ui').style.display = 'block';
+            
+            // 同步將 Firebase 的房間狀態轉回「準備中」，通知所有連線學生待命
+            roomRef.update({
+                isStarted: false,
+                isEnded: false,
+                currentQuestion: 0,
+                answered: false,
+                winner: "",
+                currentAnsStr: "",
+                optionsStr: "",
+                fullSentenceText: ""
+            });
+        }
+
         function showFinalLeaderboard() {
-            // 🚀 關鍵修復：進入結算畫面時，強制將「獲得10分」的獨立橫條設為隱藏 (none)
             document.getElementById('winner-banner').style.display = 'none';
             document.getElementById('next-btn').style.display = 'none';
             
@@ -328,8 +347,8 @@
                 
                 html += `</tbody></table>`;
                 
-                // 🚀 新增功能：在表格最下方插入「回到文法主選單」的精美按鈕
-                html += `<button class="btn btn-home" onclick="window.location.href='index.html'">🏠 回到文法主選單</button></div>`;
+                // 🚀 依照指定需求：按鈕名稱正名為「🔄 回到遊戲室」，並綁定 resetToGameRoom 函式
+                html += `<button class="btn btn-room" onclick="resetToGameRoom()">🔄 回到遊戲室</button></div>`;
                 
                 display.innerHTML = html;
 
