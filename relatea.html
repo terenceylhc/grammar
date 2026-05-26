@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>關係子句魔法教室 - 大螢幕端</title>
+    <title>關係子句魔法教室 - 大螢幕競賽端</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
@@ -12,12 +12,12 @@
             background-color: #f7f4eb;
             color: #1a1a1a;
             margin: 0;
-            padding: 30px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
         }
         .header {
             width: 100%;
@@ -28,11 +28,11 @@
             background: #fff;
             border: 3px solid #1a1a1a;
             border-radius: 12px;
-            padding: 15px 30px;
+            padding: 10px 25px;
             box-shadow: 5px 5px 0px #1a1a1a;
         }
         .room-code-tag {
-            font-size: 24pt;
+            font-size: 20pt;
             font-weight: bold;
             background: #ffd54f;
             padding: 8px 20px;
@@ -46,17 +46,29 @@
             border: 3px solid #1a1a1a;
             border-radius: 16px;
             box-shadow: 6px 6px 0px #1a1a1a;
-            margin-top: 25px;
+            margin-top: 20px;
             padding: 40px;
-            min-height: 400px;
+            min-height: 380px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
         }
+        /* 設定面板樣式 */
+        .setup-panel {
+            width: 100%;
+            max-width: 600px;
+            text-align: left;
+        }
+        .setup-panel h3 { margin-top: 20px; border-bottom: 2px solid #1a1a1a; padding-bottom: 5px;}
+        .checkbox-group { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
+        .checkbox-label { font-size: 14pt; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .checkbox-label input { width: 20px; height: 20px; }
+        
+        /* 題目字體樣式 */
         .sentence-area {
-            font-size: 28pt;
+            font-size: 26pt;
             line-height: 2;
             display: flex;
             flex-wrap: wrap;
@@ -71,97 +83,93 @@
             font-weight: bold;
             background-color: rgba(229, 115, 115, 0.08);
         }
-        .slot-container {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .slot-container { display: inline-flex; align-items: center; gap: 10px; }
         .slot {
-            width: 140px;
-            height: 65px;
-            border: 4px dashed #4fc3f7;
-            border-radius: 10px;
-            background: #e1f5fe;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18pt;
-            color: #0288d1;
-            font-weight: bold;
-            transition: all 0.3s;
+            width: 140px; height: 65px; border: 4px dashed #4fc3f7; border-radius: 10px;
+            background: #e1f5fe; display: inline-flex; justify-content: center; align-items: center;
+            font-size: 18pt; color: #0288d1; font-weight: bold;
         }
-        /* 預先展示的後半段關係子句骨架 */
         .clause-skeleton {
-            font-size: 26pt;
-            color: #a1a1a1;
-            border: 2px dashed #ccc;
-            padding: 2px 10px;
-            border-radius: 8px;
-            background: #fafafa;
+            font-size: 24pt; color: #a1a1a1; border: 2px dashed #ccc; padding: 2px 10px; border-radius: 8px; background: #fafafa;
         }
         .slot.success {
-            width: auto;
-            height: auto;
-            border: 3px solid #fbc02d;
-            background-color: #fff59d;
-            color: #1a1a1a;
-            padding: 5px 15px;
-            border-radius: 6px;
+            width: auto; height: auto; border: 3px solid #fbc02d; background-color: #fff59d;
+            color: #1a1a1a; padding: 5px 15px; border-radius: 6px;
         }
+        /* 答對大標題 */
+        .winner-banner {
+            font-size: 24pt; color: #2e7d32; font-weight: bold; margin-top: 20px;
+            background: #e8f5e9; border: 2px solid #81c784; padding: 10px 30px; border-radius: 30px;
+            display: none; animation: pop 0.3s ease-out;
+        }
+        /* 學生即時飄移卡片 */
         .sync-card {
-            position: absolute;
-            padding: 12px 24px;
-            font-size: 18pt;
-            font-weight: bold;
-            border: 3px solid #1a1a1a;
-            border-radius: 12px;
-            box-shadow: 4px 4px 0px #1a1a1a;
-            background-color: white;
-            transition: left 0.1s linear, top 0.1s linear;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 99;
+            position: absolute; padding: 10px 20px; font-size: 16pt; font-weight: bold;
+            border: 3px solid #1a1a1a; border-radius: 12px; box-shadow: 4px 4px 0px #1a1a1a;
+            background-color: white; transition: left 0.1s linear, top 0.1s linear;
+            pointer-events: none; display: flex; flex-direction: column; align-items: center; z-index: 99;
         }
-        .sync-card .owner-tag {
-            font-size: 10pt;
-            background: #1a1a1a;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-top: 4px;
+        .sync-card .owner-tag { font-size: 9pt; background: #1a1a1a; color: white; padding: 1px 5px; border-radius: 4px; margin-top: 4px; }
+        
+        /* 底部即時計分板 */
+        .scoreboard-zone {
+            width: 100%; max-width: 1100px; background: #fff; border: 3px solid #1a1a1a;
+            border-radius: 12px; margin-top: 20px; padding: 15px; box-shadow: 4px 4px 0px #1a1a1a;
+            display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px;
         }
-        .student-list {
-            margin-top: 20px;
-            font-size: 14pt;
-            color: #666;
+        .score-pill {
+            font-size: 14pt; font-weight: bold; background: #f1f1f1; border: 2px solid #1a1a1a;
+            padding: 6px 15px; border-radius: 20px; min-width: 120px; text-align: center;
         }
+        .score-pill.lead { background: #fff9c4; border-color: #fbc02d; }
+
+        /* 排行榜結算樣式 */
+        .rank-table { width: 100%; max-width: 500px; border-collapse: collapse; margin-top: 20px; font-size: 16pt;}
+        .rank-table th, .rank-table td { border: 2px solid #1a1a1a; padding: 12px; text-align: center; }
+        .rank-table th { background: #ffd54f; }
+        .rank-table tr:nth-child(2) { background: #fff9c4; font-weight: bold; font-size: 18pt; } /* 第一名金黃色 */
+
         .btn {
-            background: #ffd54f;
-            border: 2px solid #1a1a1a;
-            border-radius: 8px;
-            padding: 12px 30px;
-            font-size: 14pt;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 3px 3px 0px #1a1a1a;
-            margin-top: 30px;
+            background: #ffd54f; border: 2px solid #1a1a1a; border-radius: 8px;
+            padding: 12px 35px; font-size: 14pt; font-weight: bold; cursor: pointer;
+            box-shadow: 3px 3px 0px #1a1a1a; margin-top: 20px;
         }
+        @keyframes pop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h2 style="margin:0;">✨ 關係子句互動大螢幕端 ✨</h2>
+        <h2 style="margin:0;">✨ 關係子句魔法教室 - 團體競賽大螢幕 ✨</h2>
         <div class="room-code-tag" id="room-display">房間號碼：生成中...</div>
     </div>
 
     <div class="main-board" id="board">
-        <div id="sentence-display" class="sentence-area"></div>
+        <div class="setup-panel" id="setup-ui">
+            <h2>⚙️ 課堂競賽設定</h2>
+            <p style="color: #666;">請老師先勾選本次比賽想抽出的題型，等學生都進入教室後即可點擊開始！</p>
+            
+            <h3>1. 勾選本次競賽題型：</h3>
+            <div class="checkbox-group">
+                <label class="checkbox-label"><input type="checkbox" id="type-1" checked> 題型一：基礎關代填空 (who/which/that 基礎配對)</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-2" checked> 題型二：尋找修飾標靶 (判斷後位修飾先行詞)</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-3" checked> 題型三：高級句子大拆解 (兩句合併主格結構)</label>
+            </div>
+
+            <button class="btn" id="start-game-btn" style="width: 100%; margin-top: 10px;">🎲 隨機抽出 10 題・開始比賽！</button>
+        </div>
+
+        <div id="game-play-ui" style="display:none; width:100%; text-align:center;">
+            <div style="font-size: 14pt; color: #888; margin-bottom: 15px;" id="q-progress">題目：0 / 10</div>
+            <div id="sentence-display" class="sentence-area"></div>
+            <div class="winner-banner" id="winner-banner">🏆 恭喜組別搶答成功！</div>
+        </div>
     </div>
 
-    <div class="student-list" id="students-log">等待學生進入教室...</div>
+    <div class="scoreboard-zone" id="scoreboard-ui">
+        <div style="color: #999; font-size: 12pt; width: 100%; text-align: center;">等待學生加入以同步計分板...</div>
+    </div>
+
     <button class="btn" id="next-btn" style="display:none;">下一題 ➔</button>
 
     <script>
@@ -180,73 +188,193 @@
 
         const roomCode = Math.floor(1000 + Math.random() * 9000).toString();
         document.getElementById('room-display').innerText = `教室房號：${roomCode}`;
-
-        const quizData = [
-            { id: 0, before: "Andrew lost ", antecedent: "the hat", clause: "was given by Sharon.", type: "thing", ans: ["which", "that"] },
-            { id: 1, before: "A crowd of people ", antecedent: "who gathered in the square", after: " were there for the event.", clause: "", type: "person", isSpecial: true },
-            { id: 2, before: "My mom likes to watch ", antecedent: "dramas", clause: "talk about family matters.", type: "thing", ans: ["which", "that"] }
-        ];
         
-        let currentIdx = 0;
         const roomRef = database.ref('classrooms/' + roomCode);
 
-        roomRef.set({ currentQuestion: currentIdx, answered: false, winner: "" });
+        // 🌟 30題超豐富完整題庫陣列 (完美覆蓋三大講義題型)
+        const totalPool = [
+            // 題型一：基礎填空 (type: 1)
+            { type: 1, before: "Andrew lost ", antecedent: "the hat", clause: "was given by Sharon.", ans: ["which", "that"] },
+            { type: 1, before: "My mom likes to watch ", antecedent: "dramas", clause: "talk about family matters.", ans: ["which", "that"] },
+            { type: 1, before: "The boy ", antecedent: "the boy", after: " is my brother.", clause: "is standing by the door", ans: ["who", "that"], isEmbed: true },
+            { type: 1, before: "I bought a book ", antecedent: "a book", clause: "has many beautiful pictures.", ans: ["which", "that"] },
+            { type: 1, before: "The doctor ", antecedent: "the doctor", after: " was very kind.", clause: "treated my grandfather", ans: ["who", "that"], isEmbed: true },
+            { type: 1, before: "They live in a house ", antecedent: "a house", clause: "is over one hundred years old.", ans: ["which", "that"] },
+            { type: 1, before: "The singer ", antecedent: "the singer", after: " won the award.", clause: "sang the beautiful song", ans: ["who", "that"], isEmbed: true },
+            { type: 1, before: "He likes the car ", antecedent: "the car", clause: "runs on electricity.", ans: ["which", "that"] },
+            { type: 1, before: "The teacher ", antecedent: "the teacher", after: " comes from Canada.", clause: "teaches us English", ans: ["who", "that"], isEmbed: true },
+            { type: 1, before: "Look at the dog ", antecedent: "the dog", clause: "is barking at the mailman.", ans: ["which", "that"] },
 
-        function renderQuestion(idx) {
-            const quiz = quizData[idx];
-            const display = document.getElementById('sentence-display');
-            display.innerHTML = '';
+            // 題型二：尋找修飾標靶 (type: 2)
+            { type: 2, before: "The woman ", antecedent: "who is listening to music", after: " is an actress.", clause: "", ans: ["who"] },
+            { type: 2, before: "A crowd of people ", antecedent: "who gathered in the square", after: " were there for the event.", clause: "", ans: ["who"] },
+            { type: 2, before: "I cannot find the keys ", antecedent: "which open the back door", after: ".", clause: "", ans: ["which"] },
+            { type: 2, before: "The students ", antecedent: "who passed the English exam", after: " felt very happy.", clause: "", ans: ["who"] },
+            { type: 2, before: "The multi-touch screen ", antecedent: "which was invented recently", after: " is amazing.", clause: "", ans: ["which"] },
+            { type: 2, before: "The dynamic computer ", antecedent: "that fits inside a pocket", after: " is called a smartphone.", clause: "", ans: ["that"] },
+            { type: 2, before: "Do you know the gentleman ", antecedent: "who is wearing a black suit", after: "?", clause: "", ans: ["who"] },
+            { type: 2, before: "The old library ", antecedent: "which stands on the hill", after: " will be rebuilt.", clause: "", ans: ["which"] },
+            { type: 2, before: "The cake ", antecedent: "that was made by my sister", after: " tasted sweet.", clause: "", ans: ["that"] },
+            { type: 2, before: "The monkeys ", antecedent: "which live in the mountain", after: " are very friendly.", clause: "", ans: ["which"] },
 
-            if(quiz.isSpecial) {
-                display.innerHTML = `<span>A crowd of people </span><span class="slot success">who gathered in the square</span><span> were there for the event.</span>`;
-                document.getElementById('next-btn').style.display = 'block';
+            // 題型三：高級句子大拆解/合併 (type: 3)
+            { type: 3, before: "Combine: I know a girl. / She speaks four languages. ➔ I know a girl ", antecedent: "a girl", clause: "speaks four languages.", ans: ["who", "that"] },
+            { type: 3, before: "Combine: This is the bus. / It goes to the train station. ➔ This is the bus ", antecedent: "the bus", clause: "goes to the train station.", ans: ["which", "that"] },
+            { type: 3, before: "Combine: The man is a famous chef. / He cooked the dinner. ➔ The man ", antecedent: "the man", after: " is a famous chef.", clause: "cooked the dinner", ans: ["who", "that"], isEmbed: true },
+            { type: 3, before: "Combine: The computer is expensive. / It belongs to Tom. ➔ The computer ", antecedent: "the computer", after: " is expensive.", clause: "belongs to Tom", ans: ["which", "that"], isEmbed: true },
+            { type: 3, before: "Combine: We visited a museum. / It displayed ancient arts. ➔ We visited a museum ", antecedent: "a museum", clause: "displayed ancient arts.", ans: ["which", "that"] },
+            { type: 3, before: "Combine: The girls are laughing. / They sit under the tree. ➔ The girls ", antecedent: "the girls", after: " are laughing.", clause: "sit under the tree", ans: ["who", "that"], isEmbed: true },
+            { type: 3, before: "Combine: I like the movie. / It has a happy ending. ➔ I like the movie ", antecedent: "the movie", clause: "has a happy ending.", ans: ["which", "that"] },
+            { type: 3, before: "Combine: The phone was broken. / It was on the table. ➔ The phone ", antecedent: "the phone", after: " was broken.", clause: "was on the table", ans: ["which", "that"], isEmbed: true },
+            { type: 3, before: "Combine: The officer was helpful. / He answered my questions. ➔ The officer ", antecedent: "the officer", after: " was helpful.", clause: "answered my questions", ans: ["who", "that"], isEmbed: true },
+            { type: 3, before: "Combine: She has a cat. / It loves to sleep on the sofa. ➔ She has a cat ", antecedent: "a cat", clause: "loves to sleep on the sofa.", ans: ["which", "that"] }
+        ];
+
+        let selectedQuizList = [];
+        let currentIdx = 0;
+        let globalScores = {}; 
+
+        // 初始化房間設定
+        roomRef.set({ isStarted: false, currentQuestion: 0, answered: false, winner: "" });
+
+        // 點擊開始比賽按鈕
+        document.getElementById('start-game-btn').addEventListener('click', () => {
+            const allowT1 = document.getElementById('type-1').checked;
+            const allowT2 = document.getElementById('type-2').checked;
+            const allowT3 = document.getElementById('type-3').checked;
+
+            // 篩選題型
+            let filteredPool = totalPool.filter(q => {
+                if (q.type === 1 && allowT1) return true;
+                if (q.type === 2 && allowT2) return true;
+                if (q.type === 3 && allowT3) return true;
+                return false;
+            });
+
+            if (filteredPool.length < 10) {
+                alert(`符合條件的總題數只有 ${filteredPool.length} 題，不足 10 題！請多勾選一些題型。`);
                 return;
             }
 
-            // 主要子句前半段
-            const beforeSpan = document.createElement('span');
-            beforeSpan.innerText = quiz.before;
-            
-            // 先行詞
-            const anteSpan = document.createElement('span');
-            anteSpan.className = 'antecedent';
-            anteSpan.innerText = quiz.antecedent;
-            
-            // 互動填空與後半句容器
-            const slotContainer = document.createElement('span');
-            slotContainer.className = 'slot-container';
-            slotContainer.id = 'interactive-container';
-            
-            const slotDiv = document.createElement('div');
-            slotDiv.className = 'slot';
-            slotDiv.id = 'target-slot';
-            slotDiv.innerText = '？';
-            
-            const skeletonSpan = document.createElement('span');
-            skeletonSpan.className = 'clause-skeleton';
-            skeletonSpan.id = 'clause-skeleton';
-            skeletonSpan.innerText = quiz.clause;
+            // 洗牌並隨機抽出 10 題
+            filteredPool.sort(() => Math.random() - 0.5);
+            selectedQuizList = filteredPool.slice(0, 10);
 
-            slotContainer.appendChild(slotDiv);
-            slotContainer.appendChild(skeletonSpan);
+            // 隱藏設定面板，顯示遊戲面板
+            document.getElementById('setup-ui').style.display = 'none';
+            document.getElementById('game-play-ui').style.display = 'block';
 
-            display.appendChild(beforeSpan);
-            display.appendChild(anteSpan);
-            display.appendChild(slotContainer);
-            
+            // 同步 Firebase 房間狀態，通知學生端開始
+            roomRef.update({
+                isStarted: true,
+                currentQuestion: 0,
+                answered: false
+            });
+
+            renderQuestion(0);
+        });
+
+        function renderQuestion(idx) {
+            document.getElementById('winner-banner').style.display = 'none';
             document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('q-progress').innerText = `競賽進度：第 ${idx + 1} / 10 題`;
+
+            const quiz = selectedQuizList[idx];
+            const display = document.getElementById('sentence-display');
+            display.innerHTML = '';
+
+            // 題型二（尋找修飾標靶）的渲染邏輯：直接列出包含關代的完整句子，挖空處改在先行詞
+            if (quiz.type === 2) {
+                const beforeSpan = document.createElement('span');
+                beforeSpan.innerText = quiz.before;
+                
+                const slotDiv = document.createElement('div');
+                slotDiv.className = 'slot';
+                slotDiv.id = 'target-slot';
+                slotDiv.innerText = '？先行詞';
+                slotDiv.style.width = '200px';
+
+                const afterSpan = document.createElement('span');
+                afterSpan.className = 'clause-skeleton';
+                afterSpan.style.color = '#1a1a1a';
+                afterSpan.style.border = '2px solid #fbc02d';
+                afterSpan.style.backgroundColor = '#fff59d'; // 呼應講義黃底關係子句
+                afterSpan.innerText = quiz.antecedent + quiz.after;
+
+                display.appendChild(beforeSpan);
+                display.appendChild(slotDiv);
+                display.appendChild(afterSpan);
+                return;
+            }
+
+            // 題型一與題型三（填空與合併）的完整句子骨架化呈現
+            if (quiz.isEmbed) {
+                const beforeSpan = document.createElement('span');
+                beforeSpan.className = 'antecedent';
+                beforeSpan.innerText = quiz.antecedent;
+                
+                const slotContainer = document.createElement('span');
+                slotContainer.className = 'slot-container';
+                slotContainer.id = 'interactive-container';
+                
+                const slotDiv = document.createElement('div');
+                slotDiv.className = 'slot';
+                slotDiv.id = 'target-slot';
+                slotDiv.innerText = '？';
+                
+                const skeletonSpan = document.createElement('span');
+                skeletonSpan.className = 'clause-skeleton';
+                skeletonSpan.innerText = quiz.clause;
+
+                const afterSpan = document.createElement('span');
+                afterSpan.innerText = quiz.after;
+
+                slotContainer.appendChild(slotDiv);
+                slotContainer.appendChild(skeletonSpan);
+
+                display.appendChild(beforeSpan);
+                display.appendChild(slotContainer);
+                display.appendChild(afterSpan);
+            } else {
+                const beforeSpan = document.createElement('span');
+                beforeSpan.innerText = quiz.before;
+                
+                const anteSpan = document.createElement('span');
+                anteSpan.className = 'antecedent';
+                anteSpan.innerText = quiz.antecedent;
+                
+                const slotContainer = document.createElement('span');
+                slotContainer.className = 'slot-container';
+                slotContainer.id = 'interactive-container';
+                
+                const slotDiv = document.createElement('div');
+                slotDiv.className = 'slot';
+                slotDiv.id = 'target-slot';
+                slotDiv.innerText = '？';
+                
+                const skeletonSpan = document.createElement('span');
+                skeletonSpan.className = 'clause-skeleton';
+                skeletonSpan.innerText = quiz.clause;
+
+                slotContainer.appendChild(slotDiv);
+                slotContainer.appendChild(skeletonSpan);
+
+                display.appendChild(beforeSpan);
+                display.appendChild(anteSpan);
+                display.appendChild(slotContainer);
+            }
         }
 
-        renderQuestion(currentIdx);
-
+        // 監聽學生連線與即時操作
         const board = document.getElementById('board');
         roomRef.child('students').on('value', (snapshot) => {
             const students = snapshot.val();
             if (!students) return;
 
-            const names = Object.keys(students).map(k => students[k].name);
-            document.getElementById('students-log').innerText = `已連線學生：${names.join(', ')}`;
+            // 1. 計算即時積分板
+            updateScoreboard(students);
 
+            // 2. 處理大螢幕滑鼠卡片同步殘影
             Object.keys(students).forEach(id => {
                 const data = students[id];
                 let cardEl = document.getElementById('card-' + id);
@@ -270,23 +398,69 @@
                     }
                 }
 
-                if (data.success && !quizData[currentIdx].isSpecial) {
-                    const container = document.getElementById('interactive-container');
-                    if (container && !container.classList.contains('combined')) {
-                        container.classList.add('combined');
-                        // 答對時，將空槽與骨架融合成完美的黃底關係子句結構
-                        container.innerHTML = `<span class="slot success">${data.card} ${quizData[currentIdx].clause}</span>`;
-                        roomRef.update({ answered: true, winner: data.name });
-                        document.getElementById('next-btn').style.display = 'block';
+                // 3. 有組別率先答對時的處理
+                if (data.success && selectedQuizList.length > 0) {
+                    const quiz = selectedQuizList[currentIdx];
+                    
+                    // 題型二答對結算
+                    if (quiz.type === 2) {
+                        const slot = document.getElementById('target-slot');
+                        if (slot && !slot.classList.contains('success')) {
+                            slot.className = 'slot success';
+                            slot.innerText = `[ ${quiz.before.trim() || '主詞'} ]`;
+                            triggerWinner(data.name);
+                        }
+                    } else {
+                        // 題型一與三答對結算
+                        const container = document.getElementById('interactive-container');
+                        if (container && !container.classList.contains('combined')) {
+                            container.classList.add('combined');
+                            container.innerHTML = `<span class="slot success">${data.card} ${quiz.clause}</span>`;
+                            triggerWinner(data.name);
+                        }
                     }
                 }
             });
         });
 
+        function triggerWinner(winnerName) {
+            document.getElementById('winner-banner').innerText = `🏆 搶答成功！恭喜【${winnerName}】獲得 10 分！`;
+            document.getElementById('winner-banner').style.display = 'block';
+            document.getElementById('next-btn').style.display = 'block';
+            roomRef.update({ answered: true, winner: winnerName });
+        }
+
+        function updateScoreboard(students) {
+            const scZone = document.getElementById('scoreboard-ui');
+            scZone.innerHTML = '';
+
+            // 統計各組累計分數
+            let scores = {};
+            Object.keys(students).forEach(k => {
+                scores[students[k].name] = students[k].score || 0;
+            });
+            globalScores = scores; // 存入全域供結算用
+
+            let sorted = Object.keys(scores).sort((a,b) => scores[b] - scores[a]);
+            if(sorted.length === 0) {
+                scZone.innerHTML = `<div style="color: #999; font-size: 12pt; width: 100%; text-align: center;">等待學生登入中...</div>`;
+                return;
+            }
+
+            sorted.forEach((name, i) => {
+                const pill = document.createElement('div');
+                pill.className = `score-pill ${i === 0 ? 'lead' : ''}`;
+                pill.innerText = `${i === 0 ? '👑 ' : ''}${name}：${scores[name]} 分`;
+                scZone.appendChild(pill);
+            });
+        }
+
+        // 下一題按鈕點擊
         document.getElementById('next-btn').addEventListener('click', () => {
             currentIdx++;
-            if(currentIdx < quizData.length) {
+            if (currentIdx < 10) {
                 roomRef.update({ currentQuestion: currentIdx, answered: false, winner: "" });
+                // 重設所有學生的本題成功狀態
                 roomRef.child('students').once('value', snap => {
                     const students = snap.val();
                     if(students) {
@@ -297,10 +471,45 @@
                 });
                 renderQuestion(currentIdx);
             } else {
-                document.getElementById('sentence-display').innerHTML = "🏆 全數通關！全班完美掌握主格關係代名詞結構！";
-                document.getElementById('next-btn').style.display = 'none';
+                // 10 題全部結束，秀出最終頒獎排行榜
+                roomRef.update({ isEnded: true });
+                showFinalLeaderboard();
             }
         });
+
+        function showFinalLeaderboard() {
+            document.getElementById('next-btn').style.display = 'none';
+            const display = document.getElementById('sentence-display');
+            document.getElementById('q-progress').innerText = "🏁 競賽結束！最終成績結算排行";
+            
+            let html = `
+                <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
+                    <h2>🏆 關係子句魔法大賽・頒獎台 🏆</h2>
+                    <table class="rank-table">
+                        <thead>
+                            <tr>
+                                <th>名次</th>
+                                <th>組別 / 學生姓名</th>
+                                <th>總得分</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            let sorted = Object.keys(globalScores).sort((a,b) => globalScores[b] - globalScores[a]);
+            sorted.forEach((name, idx) => {
+                html += `
+                    <tr>
+                        <td>第 ${idx + 1} 名</td>
+                        <td>${name}</td>
+                        <td>${globalScores[name]} 分</td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table></div>`;
+            display.innerHTML = html;
+        }
     </script>
 </body>
 </html>
