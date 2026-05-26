@@ -3,75 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文法解析：關係子句</title>
+    <title>文法解析：關係子句學習基地</title>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         body {
             font-family: 'Chalkboard SE', 'Microsoft JhengHei', sans-serif;
-            background-color: #f7f4eb;
-            color: #1a1a1a;
-            margin: 0;
-            padding: 30px 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-color: #f7f4eb; color: #1a1a1a; margin: 0; padding: 20px 15px;
+            display: flex; flex-direction: column; align-items: center;
         }
         .container {
-            max-width: 850px;
-            width: 100%;
-            background: white;
-            border: 3px solid #1a1a1a;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 6px 6px 0px #1a1a1a;
+            max-width: 900px; width: 100%; background: white; border: 3px solid #1a1a1a;
+            border-radius: 16px; padding: 30px; box-shadow: 6px 6px 0px #1a1a1a; box-sizing: border-box;
         }
-        h1 {
-            text-align: center;
-            margin-top: 0;
-            text-shadow: 2px 2px 0px #ffd54f;
+        h1 { text-align: center; margin-top: 0; text-shadow: 2px 2px 0px #ffd54f; font-size: 26pt; }
+        .back-link { text-decoration: none; color: #0288d1; font-weight: bold; display: inline-block; margin-bottom: 20px; }
+        
+        /* 🌟 全新互動教學黑板樣式 */
+        .teaching-board {
+            background-color: #263238; border: 4px solid #1a1a1a; border-radius: 12px;
+            padding: 25px; margin-bottom: 30px; box-shadow: 4px 4px 0px #1a1a1a; color: white;
         }
-        .back-link {
-            text-decoration: none;
-            color: #0288d1;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 20px;
+        .teaching-board h3 { margin-top: 0; color: #ffd54f; border-bottom: 1px dashed #546e7a; padding-bottom: 8px; }
+        .raw-sentences { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; font-size: 14pt; color: #b0bec5; }
+        
+        /* 磁鐵字塊排版托盤 */
+        .sandbox-tray {
+            background: #37474f; border: 2px dashed #607d8b; border-radius: 8px;
+            padding: 20px; min-height: 80px; display: flex; flex-wrap: wrap; gap: 12px;
+            align-items: center; justify-content: center; margin-top: 15px;
         }
-        .grammar-box {
-            background-color: #fafafa;
-            border: 2px solid #1a1a1a;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 30px;
+        .block-token {
+            padding: 10px 16px; font-size: 15pt; font-weight: bold; color: #1a1a1a;
+            background: #fffde7; border: 2px solid #1a1a1a; border-radius: 6px;
+            box-shadow: 2px 2px 0px #000; cursor: grab; user-select: none; transition: background 0.2s;
         }
+        .block-token:active { cursor: grabbing; }
+        /* 轉化為關代子句時的特殊樣式 */
+        .block-token.clause-style { background-color: #fff59d; border-color: #fbc02d; }
+        .block-token.pronoun-style { background-color: #ffcdd2; cursor: pointer; } /* 代名詞按鈕 */
+
+        .grammar-box { background-color: #fafafa; border: 2px solid #1a1a1a; border-radius: 12px; padding: 20px; margin-bottom: 30px; }
         .antecedent { text-decoration: underline; font-weight: bold; }
         .relative-clause { background-color: #fff59d; padding: 2px 5px; border-radius: 4px; }
         
-        /* 遊戲按鈕區 */
+        /* 競賽遊戲室按鈕區 */
         .game-zone {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            align-items: center;
-            border-top: 2px dashed #ccc;
-            padding-top: 25px;
+            display: flex; flex-direction: column; gap: 15px; align-items: center;
+            border-top: 3px dashed #1a1a1a; padding-top: 25px; margin-top: 20px;
         }
-        .btn-group {
-            display: flex;
-            gap: 20px;
-            width: 100%;
-            max-width: 600px;
-        }
+        .btn-group { display: flex; gap: 20px; width: 100%; max-width: 600px; }
         .btn {
-            flex: 1;
-            padding: 15px;
-            font-size: 14pt;
-            font-weight: bold;
-            text-align: center;
-            text-decoration: none;
-            color: #1a1a1a;
-            border: 3px solid #1a1a1a;
-            border-radius: 12px;
-            box-shadow: 4px 4px 0px #1a1a1a;
+            flex: 1; padding: 15px; font-size: 14pt; font-weight: bold; text-align: center;
+            text-decoration: none; color: #1a1a1a; border: 3px solid #1a1a1a; border-radius: 12px;
+            box-shadow: 4px 4px 0px #1a1a1a; transition: all 0.1s;
         }
         .btn-teacher { background-color: #ffcdd2; }
         .btn-student { background-color: #c8e6c9; }
@@ -83,8 +67,24 @@
 
     <div class="container">
         <a href="index.html" class="back-link">⬅ 回到文法首頁</a>
-        <h1>🔮 關係子句 (主格用法)</h1>
+        <h1>🔮 關係子句 (主格用法用法)</h1>
         
+        <div class="teaching-board">
+            <h3>🏫 互動講義：動態句子合併示範黑板</h3>
+            <div class="raw-sentences">
+                <div>主要句子 A：The cake was delicious.</div>
+                <div>次要句子 B：<span style="color:#ff8a80; font-weight:bold;">It</span> had fresh strawberries.</div>
+            </div>
+            <p style="color: #ce93d8; font-size: 11pt; margin: 5px 0;">💡 教學步驟：1. 先點擊紅色 <span style="background:#ffcdd2; color:#1a1a1a; padding:1px 4px; border-radius:3px;">It</span> 將它轉化為關係代名詞。 2. 左右拖曳方塊自由重組，卡入修飾位置！</p>
+            
+            <div class="sandbox-tray" id="teaching-sandbox">
+                <div class="block-token" data-id="main-1">The cake</div>
+                <div class="block-token pronoun-style" id="it-token" data-id="sub-1">It</div>
+                <div class="block-token" id="sub-2" data-id="sub-2">had fresh strawberries</div>
+                <div class="block-token" id="main-2" data-id="main-2">was delicious.</div>
+            </div>
+        </div>
+
         <div class="grammar-box">
             <h3>核心概念解析：</h3>
             <p>1. <strong>關係子句：</strong> 由關係代名詞引導的子句，放在先行詞 (N) 後面作修飾。特別是 N 不夠明確時，需要關係子句來細加說明。</p>
@@ -102,8 +102,8 @@
         </div>
 
         <div class="game-zone">
-            <h3>🎮 進入連線教室互動小工具</h3>
-            <p style="color: #666; margin: 0 0 10px 0;">老師開啟大螢幕端建立房間，學生使用平板開啟學生端輸入房號連線操作！</p>
+            <h3 style="margin:0; font-size:16pt;">🎮 進入競賽遊戲室</h3>
+            <p style="color: #666; margin: 0 0 5px 0;">老師開啟大螢幕端建立房間，學生使用手機/平板開啟學生端輸入房號連線操作！</p>
             <div class="btn-group">
                 <a href="relatea.html" class="btn btn-teacher">🖥️ 我是老師 (大螢幕端)</a>
                 <a href="relastu.html" class="btn btn-student">📱 我是學生 (平板控制器)</a>
@@ -111,5 +111,43 @@
         </div>
     </div>
 
+    <script>
+        // 點擊 It 轉換為關代子句的互動腳本
+        let isTransformed = false;
+        const itToken = document.getElementById('it-token');
+        const sub2Token = document.getElementById('sub-2');
+
+        itToken.addEventListener('click', () => {
+            if (!isTransformed) {
+                isTransformed = true;
+                // 1. 將 It 變身為 which / that
+                itToken.innerText = "which / that";
+                itToken.className = "block-token clause-style"; // 切換為關係子句黃色風格
+                sub2Token.className = "block-token clause-style";
+                
+                // 2. 噴發驚喜特效小拉炮，加強課堂視覺印象
+                if(typeof confetti === 'function') {
+                    confetti({ particleCount: 30, spread: 60, origin: { y: 0.4 } });
+                }
+            }
+        });
+
+        // 啟動黑板的左右磁鐵重組拖曳機能
+        const tray = document.getElementById('teaching-sandbox');
+        new Sortable(tray, {
+            animation: 200,
+            ghostClass: 'sortable-ghost',
+            onEnd: function (evt) {
+                // 檢查是否成功排出了完美的插入型高級句語順
+                const order = Array.from(tray.children).map(el => el.getAttribute('data-id')).join(',');
+                if (order === "main-1,sub-1,sub-2,main-2" && isTransformed) {
+                    // 如果排對了，立刻給予視覺回饋
+                    itToken.style.backgroundColor = "#fff59d";
+                    sub2Token.style.backgroundColor = "#fff59d";
+                    document.getElementById('main-1').style.borderBottom = "4px dashed #e57373";
+                }
+            }
+        });
+    </script>
 </body>
 </html>
