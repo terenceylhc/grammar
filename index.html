@@ -11,36 +11,34 @@
             display: flex; flex-direction: column; align-items: center;
         }
         .container {
-            max-width: 1000px; width: 100%; background: white; border: 3px solid #1a1a1a;
+            max-width: 850px; width: 100%; background: white; border: 3px solid #1a1a1a;
             border-radius: 16px; padding: 30px; box-shadow: 6px 6px 0px #1a1a1a; box-sizing: border-box;
         }
         h1 { text-align: center; margin-top: 0; text-shadow: 2px 2px 0px #ffd54f; font-size: 28pt; margin-bottom: 30px; }
         
-        /* 橫向文法主題列 */
+        /* 🌟 乾淨整齊的單一橫列主題卡片，整列皆可點擊 */
         .grammar-row {
             display: flex; align-items: center; justify-content: space-between;
-            background: #fafafa; border: 3px solid #1a1a1a; border-radius: 12px;
-            padding: 20px 25px; margin-bottom: 20px; box-shadow: 4px 4px 0px #1a1a1a;
-            gap: 20px; flex-wrap: wrap;
+            border: 3px solid #1a1a1a; border-radius: 12px;
+            padding: 22px 28px; margin-bottom: 22px; box-shadow: 4px 4px 0px #1a1a1a;
+            cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;
+            gap: 20px;
         }
-        .row-info { flex: 1; min-width: 250px; }
-        .row-title { font-size: 18pt; font-weight: bold; margin: 0 0 5px 0; color: #1a1a1a; }
-        .row-desc { font-size: 11pt; color: #666; margin: 0; }
+        /* 新粗獷主義點擊下沉反饋 */
+        .grammar-row:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px #1a1a1a; }
+        .grammar-row:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #1a1a1a; }
         
-        /* 按鈕群組排版 */
-        .row-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-        .btn {
-            padding: 10px 20px; font-size: 11pt; font-weight: bold; text-align: center;
-            text-decoration: none; color: #1a1a1a; border: 2px solid #1a1a1a; border-radius: 8px;
-            box-shadow: 2px 2px 0px #1a1a1a; cursor: pointer; transition: all 0.1s;
-        }
-        .btn:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0px #1a1a1a; }
-        .btn:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0px #1a1a1a; }
+        /* 各主題亮麗的手繪風代表色 */
+        .g-theme-1 { background-color: #ffcdd2; } /* 授予動詞粉紅 */
+        .g-theme-2 { background-color: #c8e6c9; } /* 虛主詞綠 */
+        .g-theme-3 { background-color: #fff59d; } /* 關係子句黃 */
         
-        .btn-notes { background-color: #fff59d; } /* 講義黃 */
-        .btn-teacher { background-color: #ffcdd2; } /* 老師紅 */
-        .btn-student { background-color: #c8e6c9; } /* 學生綠 */
-        .btn-external { background-color: #b3e5fc; } /* 外部連結藍 */
+        .row-info { flex: 1; }
+        .row-title { font-size: 18pt; font-weight: bold; margin: 0 0 6px 0; color: #1a1a1a; }
+        .row-desc { font-size: 11pt; color: #444; margin: 0; }
+        
+        /* 右側精美箭頭提示 */
+        .row-arrow { font-size: 18pt; font-weight: bold; color: #1a1a1a; user-select: none; }
 
         /* 彈出視窗 (Modal) 核心樣式 */
         .modal-overlay {
@@ -50,12 +48,12 @@
         }
         .modal-box {
             background: white; border: 4px solid #1a1a1a; border-radius: 16px;
-            width: 100%; max-width: 900px; max-height: 92vh; display: flex; flex-direction: column;
+            width: 100%; max-width: 950px; max-height: 92vh; display: flex; flex-direction: column;
             box-shadow: 6px 6px 0px #000; overflow: hidden; position: relative;
             animation: modalShow 0.18s ease-out;
         }
         @keyframes modalShow {
-            from { transform: scale(0.92); opacity: 0; }
+            from { transform: scale(0.93); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
         .modal-header {
@@ -65,11 +63,11 @@
         .modal-title { font-size: 16pt; font-weight: bold; margin: 0; color: #ffd54f; }
         .close-btn {
             background: #ff8a80; border: 2px solid #1a1a1a; border-radius: 6px;
-            color: #1a1a1a; font-weight: bold; padding: 5px 12px; cursor: pointer; font-size: 11pt;
+            color: #1a1a1a; font-weight: bold; padding: 6px 14px; cursor: pointer; font-size: 11pt;
         }
         .close-btn:active { transform: translate(1px, 1px); }
         .modal-body { flex: 1; overflow-y: auto; padding: 0; background: #fdfdfd; }
-        .modal-iframe { width: 100%; height: 74vh; border: none; display: block; }
+        .modal-iframe { width: 100%; height: 75vh; border: none; display: block; }
     </style>
 </head>
 <body>
@@ -77,36 +75,28 @@
     <div class="container">
         <h1>🔮 AI 英文文法互動學習基地</h1>
         
-        <div class="grammar-row">
+        <div class="grammar-row g-theme-1" onclick="openModal('🎁 授予動詞小遊戲', 'https://gemini.google.com/share/8e80c56a0ad5')">
             <div class="row-info">
                 <div class="row-title">🎁 授予動詞小遊戲</div>
                 <div class="row-desc">引導受格轉換與直接/間接受詞的精準文法直覺</div>
             </div>
-            <div class="row-actions">
-                <button class="btn btn-external" onclick="openModal('🎁 授予動詞小遊戲', 'https://gemini.google.com/share/8e80c56a0ad5')">🎮 開啟互動小遊戲</button>
-            </div>
+            <div class="row-arrow">➔</div>
         </div>
 
-        <div class="grammar-row">
+        <div class="grammar-row g-theme-2" onclick="openModal('🤖 虛主詞 It 的用法', 'https://gemini.google.com/share/0c2a23dcf73e')">
             <div class="row-info">
                 <div class="row-title">🤖 虛主詞 It 的用法</div>
                 <div class="row-desc">精準掌握 It is adj. for someone to V. 的句型結構與變化</div>
             </div>
-            <div class="row-actions">
-                <button class="btn btn-external" onclick="openModal('🤖 虛主詞 It 的用法', 'https://gemini.google.com/share/0c2a23dcf73e')">🎮 開啟互動小遊戲</button>
-            </div>
+            <div class="row-arrow">➔</div>
         </div>
 
-        <div class="grammar-row">
+        <div class="grammar-row g-theme-3" onclick="openModal('🔮 關係子句 (主格用法)', 'relative.html')">
             <div class="row-info">
                 <div class="row-title">🔮 關係子句 (主格用法)</div>
-                <div class="row-desc">含動態句子合併黑板、四合一關卡跨回合連線競賽遊戲室</div>
+                <div class="row-desc">內含動態句子合併示範黑板、四合一核心關卡跨回合連線競賽遊戲室</div>
             </div>
-            <div class="row-actions">
-                <button class="btn btn-notes" onclick="openModal('🔮 關係子句 - 互動講義與動態黑板', 'relative.html')">📖 互動講義</button>
-                <button class="btn btn-teacher" onclick="openModal('🖥️ 關係子句 - 老師大螢幕端', 'relatea.html')">🖥️ 老師大螢幕</button>
-                <button class="btn btn-student" onclick="openModal('📱 關係子句 - 學生控制器', 'relastu.html')">📱 學生平板</button>
-            </div>
+            <div class="row-arrow">➔</div>
         </div>
 
     </div>
@@ -130,14 +120,14 @@
 
         function openModal(title, url) {
             titleText.innerText = title;
-            iframe.src = url; // 動態注入目標連結
+            iframe.src = url; 
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden'; 
         }
 
         function closeModal() {
             modal.style.display = 'none';
-            iframe.src = ''; // 清空位址，安全中斷背景監聽與網路串流
+            iframe.src = ''; 
             document.body.style.overflow = ''; 
         }
 
