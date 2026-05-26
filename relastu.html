@@ -68,6 +68,7 @@
         let studentId = "st_" + Math.floor(Math.random() * 100000);
         let sName = ""; let roomCode = ""; let studentRef = null;
         let currentTypeKey = ""; let sortableInstance = null;
+        let targetAnsStr = "";
 
         document.getElementById('join-btn').addEventListener('click', () => {
             roomCode = document.getElementById('room-input').value;
@@ -84,7 +85,6 @@
                     studentRef = database.ref(`classrooms/${roomCode}/students/${studentId}`);
                     studentRef.set({ name: sName, x: 0, y: 0, isDragging: false, card: "", success: false, score: 0 });
 
-                    // 🚀 監聽個人分數節點：完全獨立，絕不受大螢幕重置影響
                     studentRef.child('score').on('value', snap => {
                         let scoreVal = snap.val() || 0;
                         document.getElementById('my-score').innerText = `目前積分：${scoreVal} 分`;
@@ -95,8 +95,6 @@
 
                         if (data.isStarted && !data.isEnded) {
                             targetAnsStr = data.currentAnsStr;
-                            
-                            // 🚀 核心防撞安全鎖：如果切換空檔抓到空值，直接回傳守護畫面，絕對不跳回登入
                             if (!data.currentAnsStr) return;
 
                             if (currentTypeKey !== data.currentQuestion + '_' + data.currentType) {
@@ -125,6 +123,10 @@
                         if (data.isEnded) {
                             document.getElementById('pad').style.opacity = "0.5"; document.getElementById('pad').style.pointerEvents = "none";
                             document.getElementById('game-guide').innerText = "🏁 比賽結束！請看大螢幕！";
+                        } else if (!data.isStarted) {
+                            document.getElementById('pad').style.opacity = "0.5"; document.getElementById('pad').style.pointerEvents = "none";
+                            document.getElementById('game-guide').innerText = "🔄 老師已將遊戲室重置，正在準備下一回合，請待命..."; 
+                            document.getElementById('msg').innerText = "";
                         }
                     });
                 }
@@ -137,7 +139,6 @@
             pad.className = 'pad-area'; pad.innerHTML = '';
             if(sortableInstance) { sortableInstance.destroy(); sortableInstance = null; }
 
-            // 🚀 RWD 防呆：如果資料庫切換空檔導致字串未載入，不進行渲染
             if (type === 2 && fullText) {
                 pad.classList.add('flex-row');
                 document.getElementById('game-guide').innerText = "🎯 螢光筆任務：請點亮句子中「所有的關係子句單字」！";
@@ -198,8 +199,15 @@
             } else if (currentTypeKey.endsWith('_4')) {
                 const sortedBlocks = document.querySelectorAll('.sort-token');
                 const studentOrder = Array.from(sortedBlocks).map(b => b.innerText).join(',');
-                if (studentOrder === targetAnsStr) { studentRef.update({ success: true, card: studentOrder }); } 
-                else { alertWrong(); }
+                
+                // 🚀 核心升級：將大螢幕送過來的答案字串依 "||" 切開成合法陣列，只要學生拼出任一種就過關！
+                const legalAnswers = targetAnsStr.split('||');
+                
+                if (legalAnswers.includes(studentOrder)) { 
+                    studentRef.update({ success: true, card: studentOrder }); 
+                } else { 
+                    alertWrong(); 
+                }
             }
         });
 
