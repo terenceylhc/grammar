@@ -1,4 +1,4 @@
-// 🌟 關係子句 4 種題型各 30 題，共 120 題黃金題庫（完全複校版）
+// 🌟 關係子句 4 種題型各 30 題，共 120 題（題型四支援智慧雙答案驗證鎖）
 const totalPool = [
     // === 題型一：基礎填空 (1-30 題) ===
     { type: 1, before: "Andrew lost ", antecedent: "the hat", clause: "was given by Sharon.", ans: ["which", "that"] },
@@ -98,34 +98,35 @@ const totalPool = [
     { type: 3, raw1: "The lawyer represents our team.", raw2: "She is wise.", before: "The lawyer ", after: " represents our team.", options: ["who is wise", "which is wise", "is wise"], ans: "who is wise", isEmbed: true },
 
     // === 題型四：終極磁鐵字卡重組 (91-120 題) ===
+    // 🚀 核心優化：凡是能雙向合併的插入型題目，在 ans 欄位使用 "||" 分開，前後語順皆判定合法！
     { type: 4, raw1: "I know a girl.", raw2: "She speaks four languages.", tokens: ["I know a girl", "who", "speaks four languages."], ans: "I know a girl,who,speaks four languages." },
     { type: 4, raw1: "This is the bus.", raw2: "It goes to the station.", tokens: ["This is the bus", "which", "goes to the station."], ans: "This is the bus,which,goes to the station." },
-    { type: 4, raw1: "The man cooked dinner.", raw2: "He is a chef.", tokens: ["The man", "who", "cooked dinner", "is a chef."], ans: "The man,who,cooked dinner,is a chef." },
-    { type: 4, raw1: "The computer belongs to Tom.", raw2: "It is expensive.", tokens: ["The computer", "which", "belongs to Tom", "is expensive."], ans: "The computer,which,belongs to Tom,is expensive." },
+    { type: 4, raw1: "The man cooked dinner.", raw2: "He is a chef.", tokens: ["The man", "who", "cooked dinner", "is a chef."], ans: "The man,who,cooked dinner,is a chef.||The man,who,is a chef,cooked dinner" },
+    { type: 4, raw1: "The computer belongs to Tom.", raw2: "It is expensive.", tokens: ["The computer", "which", "belongs to Tom", "is expensive."], ans: "The computer,which,belongs to Tom,is expensive.||The computer,which,is expensive,belongs to Tom" },
     { type: 4, raw1: "We visited a museum.", raw2: "It displayed ancient arts.", tokens: ["We visited a museum", "which", "displayed ancient arts."], ans: "We visited a museum,which,displayed ancient arts." },
-    { type: 4, raw1: "The girls are laughing.", raw2: "They sit under the tree.", tokens: ["The girls", "who", "sit under the tree", "are laughing."], ans: "The girls,who,sit under the tree,are laughing." },
+    { type: 4, raw1: "The girls are laughing.", raw2: "They sit under the tree.", tokens: ["The girls", "who", "sit under the tree", "are laughing."], ans: "The girls,who,sit under the tree,are laughing.||The girls,who,are laughing,sit under the tree" },
     { type: 4, raw1: "I like the movie.", raw2: "It has a happy ending.", tokens: ["I like the movie", "which", "has a happy ending."], ans: "I like the movie,which,has a happy ending." },
-    { type: 4, raw1: "The phone was broken.", raw2: "It was on the table.", tokens: ["The phone", "which", "was on the table", "was broken."], ans: "The phone,which,was on the table,was broken." },
-    { type: 4, raw1: "The officer was helpful.", raw2: "He answered my questions.", tokens: ["The officer", "who", "answered my questions", "was helpful."], ans: "The officer,who,answered my questions,was helpful." },
+    { type: 4, raw1: "The phone was broken.", raw2: "It was on the table.", tokens: ["The phone", "which", "was on the table", "was broken."], ans: "The phone,which,was on the table,was broken.||The phone,which,was broken,was on the table" },
+    { type: 4, raw1: "The officer was helpful.", raw2: "He answered my questions.", tokens: ["The officer", "who", "answered my questions", "was helpful."], ans: "The officer,who,answered my questions,was helpful.||The officer,who,was helpful,answered my questions" },
     { type: 4, raw1: "She has a cat.", raw2: "It loves to sleep on the sofa.", tokens: ["She has a cat", "which", "loves to sleep on the sofa."], ans: "She has a cat,which,loves to sleep on the sofa." },
     { type: 4, raw1: "They met the author.", raw2: "He wrote the best book.", tokens: ["They met the author", "who", "wrote the best book."], ans: "They met the author,who,wrote the best book." },
-    { type: 4, raw1: "The watch is a gift.", raw2: "It is made of gold.", tokens: ["The watch", "which", "is made of gold", "is a gift."], ans: "The watch,which,is made of gold,is a gift." },
-    { type: 4, raw1: "The boy was praised.", raw2: "He saved the puppy.", tokens: ["The boy", "who", "saved the puppy", "was praised."], ans: "The boy,who,saved the puppy,was praised." },
+    { type: 4, raw1: "The watch is a gift.", raw2: "It is made of gold.", tokens: ["The watch", "which", "is made of gold", "is a gift."], ans: "The watch,which,is made of gold,is a gift.||The watch,which,is a gift,is made of gold" },
+    { type: 4, raw1: "The boy was praised.", raw2: "He saved the puppy.", tokens: ["The boy", "who", "saved the puppy", "was praised."], ans: "The boy,who,saved the puppy,was praised.||The boy,who,was praised,saved the puppy" },
     { type: 4, raw1: "I live in an apartment.", raw2: "It overlooks the park.", tokens: ["I live in an apartment", "which", "overlooks the park."], ans: "I live in an apartment,which,overlooks the park." },
-    { type: 4, raw1: "The building was destroyed.", raw2: "It stood here.", tokens: ["The building", "which", "stood here", "was destroyed."], ans: "The building,which,stood here,was destroyed." },
-    { type: 4, raw1: "The student won the scholarship.", raw2: "She works hard.", tokens: ["The student", "who", "works hard", "won the scholarship."], ans: "The student,who,works hard,won the scholarship." },
+    { type: 4, raw1: "The building was destroyed.", raw2: "It stood here.", tokens: ["The building", "which", "stood here", "was destroyed."], ans: "The building,which,stood here,was destroyed.||The building,which,was destroyed,stood here" },
+    { type: 4, raw1: "The student won the scholarship.", raw2: "She works hard.", tokens: ["The student", "who", "works hard", "won the scholarship."], ans: "The student,who,works hard,won the scholarship.||The student,who,won the scholarship,works hard" },
     { type: 4, raw1: "This is the photo.", raw2: "It reminds me of summer.", tokens: ["This is the photo", "which", "reminds me of summer."], ans: "This is the photo,which,reminds me of summer." },
-    { type: 4, raw1: "The firemen were brave.", raw2: "They put out the fire.", tokens: ["The firemen", "who", "put out the fire", "were brave."], ans: "The firemen,who,put out the fire,were brave." },
+    { type: 4, raw1: "The firemen were brave.", raw2: "They put out the fire.", tokens: ["The firemen", "who", "put out the fire", "were brave."], ans: "The firemen,who,put out the fire,were brave.||The firemen,who,were brave,put out the fire" },
     { type: 4, raw1: "He lost the wallet.", raw2: "It contained his ID card.", tokens: ["He lost the wallet", "which", "contained his ID card."], ans: "He lost the wallet,which,contained his ID card." },
-    { type: 4, raw1: "The cake was delicious.", raw2: "It had fresh strawberries.", tokens: ["The cake", "which", "had fresh strawberries", "was delicious."], ans: "The cake,which,had fresh strawberries,was delicious." },
+    { type: 4, raw1: "The cake was delicious.", raw2: "It had fresh strawberries.", tokens: ["The cake", "which", "had fresh strawberries", "was delicious."], ans: "The cake,which,had fresh strawberries,was delicious.||The cake,which,was delicious,had fresh strawberries" }, // 📌 您抓到的這題！完美包容雙解！
     { type: 4, raw1: "I know the dentist.", raw2: "He pulled out your tooth.", tokens: ["I know the dentist", "who", "pulled out your tooth."], ans: "I know the dentist,who,pulled out your tooth." },
-    { type: 4, raw1: "The shoes are tight.", raw2: "I bought them yesterday.", tokens: ["The shoes", "which", "were bought yesterday", "are tight."], ans: "The shoes,which,were bought yesterday,are tight." },
-    { type: 4, raw1: "The people were friendly.", raw2: "They welcomed us.", tokens: ["The people", "who", "welcomed us", "were friendly."], ans: "The people,who,welcomed us,were friendly." },
-    { type: 4, raw1: "The contract was signed.", raw2: "It binds the two firms.", tokens: ["The contract", "which", "binds the two firms", "was signed."], ans: "The contract,which,binds the two firms,was signed." },
+    { type: 4, raw1: "The shoes are tight.", raw2: "I bought them yesterday.", tokens: ["The shoes", "which", "were bought yesterday", "are tight."], ans: "The shoes,which,were bought yesterday,are tight.||The shoes,which,are tight,were bought yesterday" },
+    { type: 4, raw1: "The people were friendly.", raw2: "They welcomed us.", tokens: ["The people", "who", "welcomed us", "were friendly."], ans: "The people,who,welcomed us,were friendly.||The people,who,were friendly,welcomed us" },
+    { type: 4, raw1: "The contract was signed.", raw2: "It binds the two firms.", tokens: ["The contract", "which", "binds the two firms", "was signed."], ans: "The contract,which,binds the two firms,was signed.||The contract,which,was signed,binds the two firms" },
     { type: 4, raw1: "He adopted a puppy.", raw2: "It has floppy brown ears.", tokens: ["He adopted a puppy", "which", "has floppy brown ears."], ans: "He adopted a puppy,which,has floppy brown ears." },
-    { type: 4, raw1: "The woman was polite.", raw2: "She answered the phone.", tokens: ["The woman", "who", "answered the phone", "was polite."], ans: "The woman,who,answered the phone,was polite." },
+    { type: 4, raw1: "The woman was polite.", raw2: "She answered the phone.", tokens: ["The woman", "who", "answered the phone", "was polite."], ans: "The woman,who,answered the phone,was polite.||The woman,who,was polite,answered the phone" },
     { type: 4, raw1: "This is the map.", raw2: "It shows the secret path.", tokens: ["This is the map", "which", "shows the secret path."], ans: "This is the map,which,shows the secret path." },
-    { type: 4, raw1: "The workers are tired.", raw2: "They built the brick wall.", tokens: ["The workers", "who", "built the brick wall", "are tired."], ans: "The workers,who,built the brick wall,are tired." },
+    { type: 4, raw1: "The workers are tired.", raw2: "They built the brick wall.", tokens: ["The workers", "who", "built the brick wall", "are tired."], ans: "The workers,who,built the brick wall,are tired.||The workers,who,are tired,built the brick wall" },
     { type: 4, raw1: "I want to see the painting.", raw2: "It won first prize.", tokens: ["I want to see the painting", "which", "won first prize."], ans: "I want to see the painting,which,won first prize." },
-    { type: 4, raw1: "The lawyer represents our team.", raw2: "She is wise.", tokens: ["The lawyer", "who", "is wise", "represents our team."], ans: "The lawyer,who,is wise,represents our team." }
+    { type: 4, raw1: "The lawyer represents our team.", raw2: "She is wise.", tokens: ["The lawyer", "who", "is wise", "represents our team."], ans: "The lawyer,who,is wise,represents our team.||The lawyer,who,represents our team,is wise" }
 ];
