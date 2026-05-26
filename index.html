@@ -39,4 +39,120 @@
         
         .btn-notes { background-color: #fff59d; } /* 講義黃 */
         .btn-teacher { background-color: #ffcdd2; } /* 老師紅 */
-        .btn-student { background-color: #c8e6c9
+        .btn-student { background-color: #c8e6c9; } /* 學生綠 */
+
+        /* 🌟 全新彈出視窗 (Modal) 樣式 */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center;
+            z-index: 1000; padding: 15px; box-sizing: border-box;
+        }
+        .modal-box {
+            background: white; border: 4px solid #1a1a1a; border-radius: 16px;
+            width: 100%; max-width: 850px; max-height: 90vh; display: flex; flex-direction: column;
+            box-shadow: 6px 6px 0px #000; overflow: hidden; position: relative;
+            animation: modalShow 0.2s ease-out;
+        }
+        @keyframes modalShow {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-header {
+            background: #263238; color: white; padding: 15px 20px;
+            display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #1a1a1a;
+        }
+        .modal-title { font-size: 16pt; font-weight: bold; margin: 0; color: #ffd54f; }
+        .close-btn {
+            background: #ff8a80; border: 2px solid #1a1a1a; border-radius: 6px;
+            color: #1a1a1a; font-weight: bold; padding: 5px 12px; cursor: pointer; font-size: 12pt;
+        }
+        .modal-body { flex: 1; overflow-y: auto; padding: 0; background: #fdfdfd; }
+        
+        /* 讓內嵌的 iframe 完美填滿視窗 */
+        .modal-iframe { width: 100%; height: 70vh; border: none; display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🔮 AI 英文文法互動學習基地</h1>
+        
+        <div class="grammar-row">
+            <div class="row-info">
+                <div class="row-title">🔮 關係子句 (主格用法)</div>
+                <div class="row-desc">學習 who, which, that 的句子合併邏輯與磁鐵搶答賽</div>
+            </div>
+            <div class="row-actions">
+                <button class="btn btn-notes" onclick="openModal('🔮 關係子句 - 互動講義', 'relative.html')">📖 互動講義</button>
+                <button class="btn btn-teacher" onclick="openModal('🖥️ 關係子句 - 老師大螢幕端', 'relatea.html')">🖥️ 老師大螢幕</button>
+                <button class="btn btn-student" onclick="openModal('📱 關係子句 - 學生控制器', 'relastu.html')">📱 學生平板</button>
+            </div>
+        </div>
+
+        <div class="grammar-row" style="opacity: 0.65;">
+            <div class="row-info">
+                <div class="row-title">⏳ 分詞構句 (預留主題)</div>
+                <div class="row-desc">動態簡化副詞子句，轉化為 V-ing 與 p.p. 的高級結構</div>
+            </div>
+            <div class="row-actions">
+                <button class="btn btn-notes" disabled>📖 互動講義</button>
+                <button class="btn btn-teacher" disabled>🖥️ 老師大螢幕</button>
+                <button class="btn btn-student" disabled>📱 學生平板</button>
+            </div>
+        </div>
+
+        <div class="grammar-row" style="opacity: 0.65;">
+            <div class="row-info">
+                <div class="row-title">🛡️ 被動語態 (預留主題)</div>
+                <div class="row-desc">掌握 be + p.p. 核心動作受體轉換與時態大融合</div>
+            </div>
+            <div class="row-actions">
+                <button class="btn btn-notes" disabled>📖 互動講義</button>
+                <button class="btn btn-teacher" disabled>🖥️ 老師大螢幕</button>
+                <button class="btn btn-student" disabled>📱 學生平板</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-overlay" id="global-modal" onclick="closeModalOnOverlay(event)">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modal-title-text">視窗標題</h4>
+                <button class="close-btn" onclick="closeModal()">❌ 關閉視窗</button>
+            </div>
+            <div class="modal-body">
+                <iframe class="modal-iframe" id="modal-frame" src=""></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('global-modal');
+        const iframe = document.getElementById('modal-frame');
+        const titleText = document.getElementById('modal-title-text');
+
+        // 🚀 開啟彈出視窗
+        function openModal(title, url) {
+            titleText.innerText = title;
+            iframe.src = url; // 載入對應的 html 檔案
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // 鎖定背景網頁滾動
+        }
+
+        // 🔒 關閉彈出視窗
+        function closeModal() {
+            modal.style.display = 'none';
+            iframe.src = ''; // 清空 src 停止網頁運行（例如中斷 Firebase 連線）
+            document.body.style.overflow = ''; // 恢復背景網頁滾動
+        }
+
+        // 點擊黑邊陰影處也能直接關閉（貼心防呆）
+        function closeModalOnOverlay(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
