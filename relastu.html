@@ -7,39 +7,13 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
-        body {
-            font-family: 'Microsoft JhengHei', sans-serif;
-            background-color: #f7f4eb; margin: 0; padding: 20px;
-            display: flex; flex-direction: column; align-items: center;
-            user-select: none; touch-action: none;
-        }
-        .login-box, .game-box {
-            width: 100%; max-width: 500px; background: white; border: 3px solid #1a1a1a;
-            border-radius: 16px; padding: 25px; box-shadow: 4px 4px 0px #1a1a1a;
-            margin-top: 20px; text-align: center; box-sizing: border-box;
-        }
-        input {
-            width: 80%; padding: 12px; font-size: 14pt; border: 2px solid #1a1a1a;
-            border-radius: 8px; margin-bottom: 15px; text-align: center;
-        }
-        .btn {
-            background: #ffd54f; border: 2px solid #1a1a1a; border-radius: 8px;
-            padding: 12px 30px; font-size: 14pt; font-weight: bold; width: 85%; cursor: pointer;
-        }
-        .pad-area {
-            background: #fafafa; border: 2px dashed #ccc; height: 260px;
-            position: relative; margin-top: 20px; border-radius: 12px;
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;
-            padding: 20px 10px; box-sizing: border-box;
-        }
-        .card {
-            width: 110px; height: 55px; line-height: 55px; font-size: 14pt; font-weight: bold;
-            border: 3px solid #1a1a1a; border-radius: 12px; background: white;
-            box-shadow: 3px 3px 0 #1a1a1a; text-align: center; touch-action: none; position: relative; z-index: 10;
-        }
-        #who { background: #ffcdd2; }
-        #which { background: #c8e6c9; }
-        #that { background: #e1bee7; }
+        body { font-family: 'Microsoft JhengHei', sans-serif; background-color: #f7f4eb; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; user-select: none; touch-action: none; }
+        .login-box, .game-box { width: 100%; max-width: 500px; background: white; border: 3px solid #1a1a1a; border-radius: 16px; padding: 25px; box-shadow: 4px 4px 0px #1a1a1a; margin-top: 20px; text-align: center; box-sizing: border-box; }
+        input { width: 80%; padding: 12px; font-size: 14pt; border: 2px solid #1a1a1a; border-radius: 8px; margin-bottom: 15px; text-align: center; }
+        .btn { background: #ffd54f; border: 2px solid #1a1a1a; border-radius: 8px; padding: 12px 30px; font-size: 14pt; font-weight: bold; width: 85%; cursor: pointer; }
+        .pad-area { background: #fafafa; border: 2px dashed #ccc; height: 260px; position: relative; margin-top: 20px; border-radius: 12px; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; padding: 20px 10px; box-sizing: border-box; }
+        .card { width: 110px; height: 55px; line-height: 55px; font-size: 14pt; font-weight: bold; border: 3px solid #1a1a1a; border-radius: 12px; background: white; box-shadow: 3px 3px 0 #1a1a1a; text-align: center; touch-action: none; position: relative; z-index: 10; }
+        #who { background: #ffcdd2; } #which { background: #c8e6c9; } #that { background: #e1bee7; }
         .card.dragging { box-shadow: 1px 1px 0 #1a1a1a; z-index: 999; }
         .status-msg { font-size: 14pt; font-weight: bold; color: #2e7d32; margin-top: 15px; min-height: 24px; }
         .score-badge { background: #1a1a1a; color: #fff; padding: 5px 15px; border-radius: 20px; font-size: 12pt; display: inline-block; margin-top: 5px;}
@@ -82,36 +56,18 @@
         const database = firebase.database();
 
         let studentId = "st_" + Math.floor(Math.random() * 100000);
-        let sName = "";
-        let roomCode = "";
-        let studentRef = null;
-        let myCurrentScore = 0;
-        let hasScoredThisRound = false;
-
-        // 30題對應的正確標準答案對照表
-        const quizAnsKey = [
-            // 題型一
-            ["which", "that"], ["which", "that"], ["who", "that"], ["which", "that"], ["who", "that"],
-            ["which", "that"], ["who", "that"], ["which", "that"], ["who", "that"], ["which", "that"],
-            // 題型二 (考點改為找出「先行詞」的屬性，who對應人，which對應物)
-            ["who"], ["who"], ["which"], ["who"], ["which"], ["which"], ["who"], ["which"], ["that"], ["which"],
-            // 題型三
-            ["who", "that"], ["which", "that"], ["who", "that"], ["which", "that"], ["which", "that"],
-            ["who", "that"], ["which", "that"], ["which", "that"], ["who", "that"], ["which", "that"]
-        ];
-        let currentQuizAns = [];
+        let sName = ""; let roomCode = ""; let studentRef = null;
+        let myCurrentScore = 0; let hasScoredThisRound = false;
+        let currentAnswers = []; // 實時儲存當前大螢幕傳過來的合法答案陣列
 
         document.getElementById('join-btn').addEventListener('click', () => {
             roomCode = document.getElementById('room-input').value;
             sName = document.getElementById('name-input').value;
-
             if(!roomCode || !sName) { alert('請完整填寫房號與組名！'); return; }
 
             const roomCheckRef = database.ref('classrooms/' + roomCode);
             roomCheckRef.once('value', (snapshot) => {
-                if(!snapshot.exists()) {
-                    alert('找不到此教室，請確認房號是否正確！');
-                } else {
+                if(!snapshot.exists()) { alert('找不到此教室！'); } else {
                     document.getElementById('login-ui').style.display = 'none';
                     document.getElementById('game-ui').style.display = 'block';
                     document.getElementById('welcome-msg').innerText = `隊伍：${sName}`;
@@ -119,24 +75,25 @@
                     studentRef = database.ref(`classrooms/${roomCode}/students/${studentId}`);
                     studentRef.set({ name: sName, x: 0, y: 0, isDragging: false, card: "", success: false, score: 0 });
 
-                    // 監聽比賽是否開始與題目切換
                     roomCheckRef.on('value', (snap) => {
-                        const data = snap.val();
-                        if(!data) return;
+                        const data = snap.val(); if(!data) return;
 
                         if (data.isStarted && !data.isEnded) {
                             document.getElementById('pad').style.opacity = "1";
                             document.getElementById('pad').style.pointerEvents = "auto";
                             document.getElementById('game-guide').innerText = `🚀 第 ${data.currentQuestion + 1} 題進行中！請向上發射卡片搶答！`;
                             
-                            // 這裡由於是隨機出題，大螢幕端在比對時會由資料庫 answered 去做防秒差攔截
+                            // 🚀 抓取最新的安全防錯答案字串並轉回陣列
+                            if(data.currentAnsStr) {
+                                currentAnswers = data.currentAnsStr.split(',');
+                            }
+
                             if (data.answered) {
                                 document.getElementById('pad').style.opacity = "0.5";
                                 document.getElementById('pad').style.pointerEvents = "none";
                                 if (data.winner === sName) {
                                     document.getElementById('msg').style.color = '#2e7d32';
-                                    document.getElementById('msg').innerText = "❤️ 恭喜你們這組拿到這題的 10 分！";
-                                    // 防止單題重複加分邏輯
+                                    document.getElementById('msg').innerText = "❤️ 搶答成功！獲得 10 分！";
                                     if (!hasScoredThisRound) {
                                         myCurrentScore += 10;
                                         document.getElementById('my-score').innerText = `目前積分：${myCurrentScore} 分`;
@@ -148,20 +105,15 @@
                                     document.getElementById('msg').innerText = `😱 被【${data.winner}】率先搶答走囉！`;
                                 }
                             } else {
-                                // 新的一題開始，重設發射限制
                                 hasScoredThisRound = false;
                                 document.getElementById('msg').innerText = "";
                             }
                         }
-                        
                         if (data.isEnded) {
-                            document.getElementById('pad').style.opacity = "0.5";
-                            document.getElementById('pad').style.pointerEvents = "none";
-                            document.getElementById('game-guide').innerText = "🏁 比賽結束！請看大螢幕頒獎台排行榜！";
-                            document.getElementById('msg').innerText = "";
+                            document.getElementById('pad').style.opacity = "0.5"; document.getElementById('pad').style.pointerEvents = "none";
+                            document.getElementById('game-guide').innerText = "🏁 比賽結束！請看大螢幕排行榜！"; document.getElementById('msg').innerText = "";
                         }
                     });
-
                     initPointerControls();
                 }
             });
@@ -169,10 +121,7 @@
 
         function resetCards() {
             const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                card.style.position = 'relative'; card.style.left = '0px'; card.style.top = '0px';
-                card.classList.remove('dragging');
-            });
+            cards.forEach(card => { card.style.position = 'relative'; card.style.left = '0px'; card.style.top = '0px'; card.classList.remove('dragging'); });
         }
 
         function initPointerControls() {
@@ -184,13 +133,9 @@
                 let startX = 0, startY = 0, origLeft = 0, origTop = 0;
 
                 card.addEventListener('pointerdown', (e) => {
-                    isPointerDown = true;
-                    card.setPointerCapture(e.pointerId);
-                    card.classList.add('dragging');
-
+                    isPointerDown = true; card.setPointerCapture(e.pointerId); card.classList.add('dragging');
                     if (card.style.position !== 'absolute') {
-                        const rect = card.getBoundingClientRect();
-                        const padRect = pad.getBoundingClientRect();
+                        const rect = card.getBoundingClientRect(); const padRect = pad.getBoundingClientRect();
                         origLeft = rect.left - padRect.left; origTop = rect.top - padRect.top;
                         card.style.position = 'absolute'; card.style.left = origLeft + 'px'; card.style.top = origTop + 'px';
                     } else {
@@ -201,37 +146,35 @@
                 });
 
                 card.addEventListener('pointermove', (e) => {
-                    if (!isPointerDown) return;
-                    e.preventDefault();
-                    let newX = origLeft + (e.clientX - startX);
-                    let newY = origTop + (e.clientY - startY);
-
-                    if(newX < 0) newX = 0;
-                    if(newX > pad.clientWidth - card.clientWidth) newX = pad.clientWidth - card.clientWidth;
+                    if (!isPointerDown) return; e.preventDefault();
+                    let newX = origLeft + (e.clientX - startX); let newY = origTop + (e.clientY - startY);
+                    if(newX < 0) newX = 0; if(newX > pad.clientWidth - card.clientWidth) newX = pad.clientWidth - card.clientWidth;
                     if(newY > pad.clientHeight - card.clientHeight) newY = pad.clientHeight - card.clientHeight;
-
                     card.style.left = newX + 'px'; card.style.top = newY + 'px';
                     studentRef.update({ x: newX * 2.2 + 50, y: newY * 1.2 + 100 });
                 });
 
                 const endHandler = (e) => {
                     if (!isPointerDown) return;
-                    isPointerDown = false;
-                    card.releasePointerCapture(e.pointerId);
-                    card.classList.remove('dragging');
+                    isPointerDown = false; card.releasePointerCapture(e.pointerId); card.classList.remove('dragging');
                     const val = card.getAttribute('data-val');
 
-                    // 向上推發射判定
                     if (parseInt(card.style.top) < 20) {
-                        // 由學生端先進行初步防錯過濾，送上資料庫後由大螢幕做唯一秒差判定
-                        studentRef.update({ success: true, isDragging: false });
+                        // 🚀 核心智慧防錯鎖定：學生平板端直接比對當前題目答案
+                        if (currentAnswers.includes(val)) {
+                            studentRef.update({ success: true, isDragging: false });
+                        } else {
+                            document.getElementById('msg').style.color = '#d32f2f';
+                            document.getElementById('msg').innerText = "❌ 屬性配對錯誤，這題不適用此關代！";
+                            setTimeout(() => { document.getElementById('msg').innerText = ""; }, 2000);
+                            resetCards();
+                            studentRef.update({ isDragging: false });
+                        }
                     } else {
-                        resetCards();
-                        studentRef.update({ isDragging: false });
+                        resetCards(); studentRef.update({ isDragging: false });
                     }
                 };
-                card.addEventListener('pointerup', endHandler);
-                card.addEventListener('pointercancel', endHandler);
+                card.addEventListener('pointerup', endHandler); card.addEventListener('pointercancel', endHandler);
             });
         }
     </script>
