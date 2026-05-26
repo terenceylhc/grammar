@@ -9,106 +9,57 @@
     <style>
         body {
             font-family: 'Microsoft JhengHei', sans-serif;
-            background-color: #f7f4eb;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            user-select: none;
-            touch-action: none;
+            background-color: #f7f4eb; margin: 0; padding: 20px;
+            display: flex; flex-direction: column; align-items: center;
+            user-select: none; touch-action: none;
         }
         .login-box, .game-box {
-            width: 100%;
-            max-width: 500px;
-            background: white;
-            border: 3px solid #1a1a1a;
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 4px 4px 0px #1a1a1a;
-            margin-top: 20px;
-            text-align: center;
-            box-sizing: border-box;
+            width: 100%; max-width: 500px; background: white; border: 3px solid #1a1a1a;
+            border-radius: 16px; padding: 25px; box-shadow: 4px 4px 0px #1a1a1a;
+            margin-top: 20px; text-align: center; box-sizing: border-box;
         }
         input {
-            width: 80%;
-            padding: 12px;
-            font-size: 14pt;
-            border: 2px solid #1a1a1a;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            width: 80%; padding: 12px; font-size: 14pt; border: 2px solid #1a1a1a;
+            border-radius: 8px; margin-bottom: 15px; text-align: center;
         }
         .btn {
-            background: #ffd54f;
-            border: 2px solid #1a1a1a;
-            border-radius: 8px;
-            padding: 12px 30px;
-            font-size: 14pt;
-            font-weight: bold;
-            width: 85%;
-            cursor: pointer;
+            background: #ffd54f; border: 2px solid #1a1a1a; border-radius: 8px;
+            padding: 12px 30px; font-size: 14pt; font-weight: bold; width: 85%; cursor: pointer;
         }
         .pad-area {
-            background: #fafafa;
-            border: 2px dashed #ccc;
-            height: 280px;
-            position: relative;
-            margin-top: 20px;
-            border-radius: 12px;
-            /* 移除 overflow:hidden，並改用 flex 排版達成手機版自適應換行 */
-            display: flex;
-            flex-wrap: wrap; 
-            justify-content: center;
-            gap: 15px;
-            padding: 20px 10px;
-            box-sizing: border-box;
+            background: #fafafa; border: 2px dashed #ccc; height: 260px;
+            position: relative; margin-top: 20px; border-radius: 12px;
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;
+            padding: 20px 10px; box-sizing: border-box;
         }
         .card {
-            width: 105px;
-            height: 55px;
-            line-height: 55px;
-            font-size: 15pt;
-            font-weight: bold;
-            border: 3px solid #1a1a1a;
-            border-radius: 12px;
-            background: white;
-            box-shadow: 3px 3px 0 #1a1a1a;
-            text-align: center;
-            touch-action: none; /* 停用網頁預設滾動，專注於拖曳 */
-            position: relative; /* 初始排版流 */
-            z-index: 10;
+            width: 110px; height: 55px; line-height: 55px; font-size: 14pt; font-weight: bold;
+            border: 3px solid #1a1a1a; border-radius: 12px; background: white;
+            box-shadow: 3px 3px 0 #1a1a1a; text-align: center; touch-action: none; position: relative; z-index: 10;
         }
         #who { background: #ffcdd2; }
         #which { background: #c8e6c9; }
         #that { background: #e1bee7; }
-        
-        .card.dragging {
-            box-shadow: 1px 1px 0 #1a1a1a;
-            z-index: 999;
-        }
-        .status-msg {
-            font-size: 14pt;
-            font-weight: bold;
-            color: #2e7d32;
-            margin-top: 15px;
-            min-height: 24px;
-        }
+        .card.dragging { box-shadow: 1px 1px 0 #1a1a1a; z-index: 999; }
+        .status-msg { font-size: 14pt; font-weight: bold; color: #2e7d32; margin-top: 15px; min-height: 24px; }
+        .score-badge { background: #1a1a1a; color: #fff; padding: 5px 15px; border-radius: 20px; font-size: 12pt; display: inline-block; margin-top: 5px;}
     </style>
 </head>
 <body>
 
     <div class="login-box" id="login-ui">
-        <h2>✨ 魔法卡控制器登入 ✨</h2>
+        <h2>✨ 競賽控制器登入 ✨</h2>
         <input type="number" id="room-input" placeholder="請輸入4位數教室房號">
-        <input type="text" id="name-input" placeholder="請輸入您的座號或姓名">
-        <button class="btn" id="join-btn">連線進入教室 ➔</button>
+        <input type="text" id="name-input" placeholder="請輸入組名 (如: 第一組)">
+        <button class="btn" id="join-btn">加入競賽 ➔</button>
     </div>
 
     <div class="game-box" id="game-ui" style="display:none;">
-        <h3 id="welcome-msg">準備就緒</h3>
-        <p style="color: #666; font-size: 11pt;">請用手指或滑鼠將魔法卡片**向上拖曳到頂部**發射至大螢幕！</p>
+        <h3 id="welcome-msg" style="margin:5px 0;">組別：未登入</h3>
+        <div class="score-badge" id="my-score">目前積分：0 分</div>
+        <p id="game-guide" style="color: #666; font-size: 11pt; margin-top: 15px;">等待老師開始比賽...</p>
         
-        <div class="pad-area" id="pad">
+        <div class="pad-area" id="pad" style="opacity: 0.5; pointer-events: none;">
             <div class="card" id="who" data-val="who">👤 who</div>
             <div class="card" id="which" data-val="which">👜 which</div>
             <div class="card" id="that" data-val="that">⭐ that</div>
@@ -134,15 +85,27 @@
         let sName = "";
         let roomCode = "";
         let studentRef = null;
-        let currentQuizAns = [];
+        let myCurrentScore = 0;
+        let hasScoredThisRound = false;
 
-        const quizAnsKey = [["which", "that"], ["who"], ["which", "that"]];
+        // 30題對應的正確標準答案對照表
+        const quizAnsKey = [
+            // 題型一
+            ["which", "that"], ["which", "that"], ["who", "that"], ["which", "that"], ["who", "that"],
+            ["which", "that"], ["who", "that"], ["which", "that"], ["who", "that"], ["which", "that"],
+            // 題型二 (考點改為找出「先行詞」的屬性，who對應人，which對應物)
+            ["who"], ["who"], ["which"], ["who"], ["which"], ["which"], ["who"], ["which"], ["that"], ["which"],
+            // 題型三
+            ["who", "that"], ["which", "that"], ["who", "that"], ["which", "that"], ["which", "that"],
+            ["who", "that"], ["which", "that"], ["which", "that"], ["who", "that"], ["which", "that"]
+        ];
+        let currentQuizAns = [];
 
         document.getElementById('join-btn').addEventListener('click', () => {
             roomCode = document.getElementById('room-input').value;
             sName = document.getElementById('name-input').value;
 
-            if(!roomCode || !sName) { alert('請完整填寫房號與姓名！'); return; }
+            if(!roomCode || !sName) { alert('請完整填寫房號與組名！'); return; }
 
             const roomCheckRef = database.ref('classrooms/' + roomCode);
             roomCheckRef.once('value', (snapshot) => {
@@ -151,22 +114,51 @@
                 } else {
                     document.getElementById('login-ui').style.display = 'none';
                     document.getElementById('game-ui').style.display = 'block';
-                    document.getElementById('welcome-msg').innerText = `同學：${sName} (房號: ${roomCode})`;
+                    document.getElementById('welcome-msg').innerText = `隊伍：${sName}`;
                     
                     studentRef = database.ref(`classrooms/${roomCode}/students/${studentId}`);
-                    studentRef.set({ name: sName, x: 0, y: 0, isDragging: false, card: "", success: false });
+                    studentRef.set({ name: sName, x: 0, y: 0, isDragging: false, card: "", success: false, score: 0 });
 
-                    roomCheckRef.child('currentQuestion').on('value', (snap) => {
-                        const qIdx = snap.val() || 0;
-                        currentQuizAns = quizAnsKey[qIdx];
-                        resetCards();
-                        document.getElementById('msg').innerText = "";
-                    });
-
-                    roomCheckRef.on('value', snap => {
+                    // 監聽比賽是否開始與題目切換
+                    roomCheckRef.on('value', (snap) => {
                         const data = snap.val();
-                        if (data && data.answered) {
-                            document.getElementById('msg').innerText = `🎉 這一題已被 ${data.winner} 答對囉！`;
+                        if(!data) return;
+
+                        if (data.isStarted && !data.isEnded) {
+                            document.getElementById('pad').style.opacity = "1";
+                            document.getElementById('pad').style.pointerEvents = "auto";
+                            document.getElementById('game-guide').innerText = `🚀 第 ${data.currentQuestion + 1} 題進行中！請向上發射卡片搶答！`;
+                            
+                            // 這裡由於是隨機出題，大螢幕端在比對時會由資料庫 answered 去做防秒差攔截
+                            if (data.answered) {
+                                document.getElementById('pad').style.opacity = "0.5";
+                                document.getElementById('pad').style.pointerEvents = "none";
+                                if (data.winner === sName) {
+                                    document.getElementById('msg').style.color = '#2e7d32';
+                                    document.getElementById('msg').innerText = "❤️ 恭喜你們這組拿到這題的 10 分！";
+                                    // 防止單題重複加分邏輯
+                                    if (!hasScoredThisRound) {
+                                        myCurrentScore += 10;
+                                        document.getElementById('my-score').innerText = `目前積分：${myCurrentScore} 分`;
+                                        studentRef.update({ score: myCurrentScore });
+                                        hasScoredThisRound = true;
+                                    }
+                                } else {
+                                    document.getElementById('msg').style.color = '#666';
+                                    document.getElementById('msg').innerText = `😱 被【${data.winner}】率先搶答走囉！`;
+                                }
+                            } else {
+                                // 新的一題開始，重設發射限制
+                                hasScoredThisRound = false;
+                                document.getElementById('msg').innerText = "";
+                            }
+                        }
+                        
+                        if (data.isEnded) {
+                            document.getElementById('pad').style.opacity = "0.5";
+                            document.getElementById('pad').style.pointerEvents = "none";
+                            document.getElementById('game-guide').innerText = "🏁 比賽結束！請看大螢幕頒獎台排行榜！";
+                            document.getElementById('msg').innerText = "";
                         }
                     });
 
@@ -178,73 +170,48 @@
         function resetCards() {
             const cards = document.querySelectorAll('.card');
             cards.forEach(card => {
-                card.style.position = 'relative';
-                card.style.left = '0px';
-                card.style.top = '0px';
+                card.style.position = 'relative'; card.style.left = '0px'; card.style.top = '0px';
                 card.classList.remove('dragging');
             });
         }
 
-        // 使用 PointerEvents 全面相容滑鼠拖曳與手指觸控
         function initPointerControls() {
             const cards = document.querySelectorAll('.card');
             const pad = document.getElementById('pad');
 
             cards.forEach(card => {
                 let isPointerDown = false;
-                let startX = 0, startY = 0;
-                let origLeft = 0, origTop = 0;
+                let startX = 0, startY = 0, origLeft = 0, origTop = 0;
 
                 card.addEventListener('pointerdown', (e) => {
                     isPointerDown = true;
-                    card.setPointerCapture(e.pointerId); // 鎖定指標路徑
+                    card.setPointerCapture(e.pointerId);
                     card.classList.add('dragging');
 
-                    // 點擊瞬間將其轉為絕對定位，以便跨越界線拖曳
                     if (card.style.position !== 'absolute') {
                         const rect = card.getBoundingClientRect();
                         const padRect = pad.getBoundingClientRect();
-                        origLeft = rect.left - padRect.left;
-                        origTop = rect.top - padRect.top;
-                        
-                        card.style.position = 'absolute';
-                        card.style.left = origLeft + 'px';
-                        card.style.top = origTop + 'px';
+                        origLeft = rect.left - padRect.left; origTop = rect.top - padRect.top;
+                        card.style.position = 'absolute'; card.style.left = origLeft + 'px'; card.style.top = origTop + 'px';
                     } else {
-                        origLeft = parseFloat(card.style.left);
-                        origTop = parseFloat(card.style.top);
+                        origLeft = parseFloat(card.style.left); origTop = parseFloat(card.style.top);
                     }
-
-                    startX = e.clientX;
-                    startY = e.clientY;
-
+                    startX = e.clientX; startY = e.clientY;
                     studentRef.update({ isDragging: true, card: card.getAttribute('data-val') });
                 });
 
                 card.addEventListener('pointermove', (e) => {
                     if (!isPointerDown) return;
                     e.preventDefault();
+                    let newX = origLeft + (e.clientX - startX);
+                    let newY = origTop + (e.clientY - startY);
 
-                    let deltaX = e.clientX - startX;
-                    let deltaY = e.clientY - startY;
-
-                    let newX = origLeft + deltaX;
-                    let newY = origTop + deltaY;
-
-                    // 限制左右不跑出框外
                     if(newX < 0) newX = 0;
                     if(newX > pad.clientWidth - card.clientWidth) newX = pad.clientWidth - card.clientWidth;
-                    // 頂部允許往上滑出框外以進行「發射」判定
                     if(newY > pad.clientHeight - card.clientHeight) newY = pad.clientHeight - card.clientHeight;
 
-                    card.style.left = newX + 'px';
-                    card.style.top = newY + 'px';
-
-                    // 同步大螢幕映射座標
-                    studentRef.update({
-                        x: newX * 2.2 + 50, 
-                        y: newY * 1.2 + 100
-                    });
+                    card.style.left = newX + 'px'; card.style.top = newY + 'px';
+                    studentRef.update({ x: newX * 2.2 + 50, y: newY * 1.2 + 100 });
                 });
 
                 const endHandler = (e) => {
@@ -252,27 +219,17 @@
                     isPointerDown = false;
                     card.releasePointerCapture(e.pointerId);
                     card.classList.remove('dragging');
-
                     const val = card.getAttribute('data-val');
-                    // 向上發射判定：若拖曳至控制框的上方邊界外
+
+                    // 向上推發射判定
                     if (parseInt(card.style.top) < 20) {
-                        if (currentQuizAns.includes(val)) {
-                            studentRef.update({ success: true, isDragging: false });
-                            document.getElementById('msg').style.color = '#2e7d32';
-                            document.getElementById('msg').innerText = "❤️ 答對了！太厲害了！";
-                        } else {
-                            document.getElementById('msg').style.color = '#d32f2f';
-                            document.getElementById('msg').innerText = "❌ 關代屬性選錯囉，再想想看！";
-                            setTimeout(() => { document.getElementById('msg').innerText = ""; }, 2000);
-                            resetCards();
-                            studentRef.update({ isDragging: false });
-                        }
+                        // 由學生端先進行初步防錯過濾，送上資料庫後由大螢幕做唯一秒差判定
+                        studentRef.update({ success: true, isDragging: false });
                     } else {
                         resetCards();
                         studentRef.update({ isDragging: false });
                     }
                 };
-
                 card.addEventListener('pointerup', endHandler);
                 card.addEventListener('pointercancel', endHandler);
             });
