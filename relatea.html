@@ -6,9 +6,7 @@
     <title>關係子句魔法教室 - 大螢幕競賽端</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
     <script src="relaquizpool.js"></script>
     <style>
         body {
@@ -26,28 +24,22 @@
             box-shadow: 6px 6px 0px #1a1a1a; margin-top: 20px; padding: 40px; min-height: 380px;
             display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative;
         }
-        .setup-panel { width: 100%; max-width: 600px; text-align: left; }
-        .setup-panel h3 { margin-top: 20px; border-bottom: 2px solid #1a1a1a; padding-bottom: 5px;}
+        .setup-panel { width: 100%; max-width: 650px; text-align: left; }
         .checkbox-group { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
-        .checkbox-label { font-size: 14pt; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .checkbox-label { font-size: 13pt; display: flex; align-items: center; gap: 10px; cursor: pointer; }
         .checkbox-label input { width: 20px; height: 20px; }
         .sentence-area { font-size: 26pt; line-height: 2; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 15px; text-align: center; }
         
         .antecedent { border-bottom: 4px dashed #e57373; padding: 0 6px; font-weight: bold; background-color: rgba(229, 115, 115, 0.08); }
-        .slot-container { display: inline-flex; align-items: center; gap: 10px; }
-        .slot {
-            width: 140px; height: 65px; border: 4px dashed #4fc3f7; border-radius: 10px;
-            background: #e1f5fe; display: inline-flex; justify-content: center; align-items: center;
-            font-size: 18pt; color: #0288d1; font-weight: bold;
-        }
+        .slot { width: 140px; height: 65px; border: 4px dashed #4fc3f7; border-radius: 10px; background: #e1f5fe; display: inline-flex; justify-content: center; align-items: center; font-size: 18pt; color: #0288d1; font-weight: bold; }
         .slot-large { width: 450px; height: 65px; border: 4px dashed #81c784; background: #e8f5e9; color: #2e7d32; border-radius: 10px; display: inline-flex; justify-content: center; align-items: center; font-size: 16pt; font-weight: bold;}
+        .slot-t5 { width: 180px; height: 60px; border: 3px dashed #ab47bc; background: #f3e5f5; color: #7b1fa2; border-radius: 8px; display: inline-flex; justify-content: center; align-items: center; font-size: 20pt; font-weight: bold; }
         .clause-skeleton { font-size: 24pt; color: #a1a1a1; border: 2px dashed #ccc; padding: 2px 10px; border-radius: 8px; background: #fafafa; }
         
         .highlight-clause { background-color: #fff59d; border: 2px solid #fbc02d; padding: 2px 12px; border-radius: 8px; animation: pop 0.3s ease-out; }
         .slot.success { width: auto; height: auto; border: 3px solid #fbc02d; background-color: #fff59d; color: #1a1a1a; padding: 5px 15px; border-radius: 6px; }
         
         .winner-banner { font-size: 22pt; color: #2e7d32; font-weight: bold; margin-top: 20px; background: #e8f5e9; border: 2px solid #81c784; padding: 10px 30px; border-radius: 30px; display: none; }
-        .sync-card { position: absolute; padding: 10px 20px; font-size: 14pt; font-weight: bold; border: 2px solid #1a1a1a; border-radius: 12px; box-shadow: 3px 3px 0px #1a1a1a; background-color: #fff9c4; transition: left 0.1s linear, top 0.1s linear; pointer-events: none; z-index: 99; }
         .scoreboard-zone { width: 100%; max-width: 1100px; background: #fff; border: 3px solid #1a1a1a; border-radius: 12px; margin-top: 20px; padding: 15px; box-shadow: 4px 4px 0px #1a1a1a; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; }
         .score-pill { font-size: 14pt; font-weight: bold; background: #f1f1f1; border: 2px solid #1a1a1a; padding: 6px 15px; border-radius: 20px; min-width: 120px; text-align: center; }
         .score-pill.lead { background: #fff9c4; border-color: #fbc02d; }
@@ -59,7 +51,7 @@
         
         .btn { background: #ffd54f; border: 2px solid #1a1a1a; border-radius: 8px; padding: 12px 35px; font-size: 14pt; font-weight: bold; cursor: pointer; box-shadow: 3px 3px 0px #1a1a1a; margin-top: 20px; }
         .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #1a1a1a; }
-        .btn-room { background: #b3e5fc; margin-top: 25px; border-width: 3px; color: #01579b; } /* 回遊戲室藍色按鈕 */
+        .btn-room { background: #b3e5fc; margin-top: 25px; border-width: 3px; color: #01579b; }
         @keyframes pop { 0% { transform: scale(0.95); } 100% { transform: scale(1); } }
     </style>
 </head>
@@ -71,16 +63,19 @@
     </div>
 
     <div class="main-board" id="board">
+        <!-- ⚙️ 老師勾選面板 (已正名題型五、六包含指定字樣) -->
         <div class="setup-panel" id="setup-ui">
-            <h2>⚙️ 課堂競賽設定 (120 題跨回合積分版)</h2>
-            <p style="color: #666;">勾選開啟題型，點擊後系統會從外掛晶片庫隨機調配 10 題進行多樣化競技！</p>
+            <h2>⚙️ 課堂競賽設定 (150題 豪華六合一版)</h2>
+            <p style="color: #666;">勾選開啟題型，系統會自動從題庫跨單元調配 10 題進行混合大決戰！</p>
             <div class="checkbox-group">
-                <label class="checkbox-label"><input type="checkbox" id="type-1" checked> 題型一：基礎關代填空 (who/which/that卡片發射)</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-1" checked> 題型一：基礎關代填空 (who/which/that發射)</label>
                 <label class="checkbox-label"><input type="checkbox" id="type-2" checked> 題型二：尋找修飾標靶 (一字字點選螢光筆玩法)</label>
-                <label class="checkbox-label"><input type="checkbox" id="type-3" checked> 題型三：文法拆解大師 (整條關係子句三選一防錯版)</label>
+                <label class="checkbox-label"><input type="checkbox" id="type-3" checked> 題型三：文法拆解大師 (整條關係子句三選一)</label>
                 <label class="checkbox-label"><input type="checkbox" id="type-4" checked> 題型四：高級排列組合 (磁鐵字塊語順大重組)</label>
+                <label class="checkbox-label" style="color:#7b1fa2; font-weight:bold;"><input type="checkbox" id="type-5" checked> 題型五：關係子句簡化為分詞片語 - 觀念發射版 (按鈕秒殺)</label>
+                <label class="checkbox-label" style="color:#01579b; font-weight:bold;"><input type="checkbox" id="type-6" checked> 題型六：關係子句簡化為分詞片語 - 磁鐵重組版 (拼圖卡位)</label>
             </div>
-            <button class="btn" id="start-game-btn" style="width: 100%;">🎲 隨機抽出 10 題・開始比賽！</button>
+            <button class="btn" id="start-game-btn" style="width: 100%;">🎲 抽出 10 題・開啟多回合跨輪大賽！</button>
         </div>
 
         <div class="game-play-ui" id="game-play-ui" style="display:none; width:100%; text-align:center;">
@@ -118,22 +113,12 @@
         let globalScores = {}; 
         let isRoundSettled = false; 
 
-        // 初始化房間
         roomRef.set({ isStarted: false, currentQuestion: 0, answered: false, winner: "", currentAnsStr: "", currentType: 1, optionsStr: "", fullSentenceText: "" });
 
         document.getElementById('start-game-btn').addEventListener('click', () => {
-            const allowT1 = document.getElementById('type-1').checked;
-            const allowT2 = document.getElementById('type-2').checked;
-            const allowT3 = document.getElementById('type-3').checked;
-            const allowT4 = document.getElementById('type-4').checked;
+            const types = [1, 2, 3, 4, 5, 6].map(t => document.getElementById(`type-${t}`).checked);
 
-            let filteredPool = totalPool.filter(q => {
-                if (q.type === 1 && allowT1) return true;
-                if (q.type === 2 && allowT2) return true;
-                if (q.type === 3 && allowT3) return true;
-                if (q.type === 4 && allowT4) return true;
-                return false;
-            });
+            let filteredPool = totalPool.filter(q => types[q.type - 1]);
 
             if (filteredPool.length < 10) { alert('符合題數不足 10 題，請勾選更多題型！'); return; }
             filteredPool.sort(() => Math.random() - 0.5);
@@ -142,7 +127,7 @@
             document.getElementById('setup-ui').style.display = 'none';
             document.getElementById('game-play-ui').style.display = 'block';
 
-            currentIdx = 0; // 重置題號索引
+            currentIdx = 0;
             syncQuestionToFirebase(0);
             renderQuestion(0);
         });
@@ -156,6 +141,8 @@
             else if (quiz.type === 2) { ansStr = quiz.target; rawText = quiz.full; }
             else if (quiz.type === 3) { ansStr = quiz.ans; optsStr = quiz.options.join('##'); rawText = `${quiz.raw1} / ${quiz.raw2}`; }
             else if (quiz.type === 4) { ansStr = quiz.ans; optsStr = quiz.tokens.join('##'); rawText = `${quiz.raw1} / ${quiz.raw2}`; }
+            else if (quiz.type === 5) { ansStr = quiz.ans; optsStr = quiz.options.join('##'); rawText = quiz.before; }
+            else if (quiz.type === 6) { ansStr = quiz.ans; optsStr = quiz.tokens.join('##'); rawText = quiz.raw1; }
 
             roomRef.update({
                 isStarted: true, isEnded: false, currentQuestion: idx, answered: false, winner: "",
@@ -183,6 +170,21 @@
             if (quiz.type === 4) {
                 display.innerHTML = `<div style="font-size:18pt; color:#666; margin-bottom:10px;">請重組句子：${quiz.raw1} / ${quiz.raw2}</div>` +
                                     `<div class="slot-large" id="target-slot" style="width:700px; height:80px; border-color:#ffd54f; background:#fffde7; color:#f57f17;">？ 等待學生平板進行語順排列重組</div>`;
+                return;
+            }
+
+            // 🌟 題型五：大螢幕挖空渲染
+            if (quiz.type === 5) {
+                let renderedText = quiz.before.replace("[ ❓ ]", `<div class="slot-t5" id="target-slot">❓ 觀念發射</div>`);
+                display.innerHTML = `<div style="font-size:16pt; color:#ab47bc; margin-bottom:10px; font-weight:bold;">📝 請在平板上點擊正確的分詞片語進行發射！</div>` + `<div>${renderedText}</div>`;
+                return;
+            }
+
+            // 🌟 題型六：大螢幕完整原句提示
+            if (quiz.type === 6) {
+                display.innerHTML = `<div style="font-size:16pt; color:#01579b; margin-bottom:10px; font-weight:bold;">🧲 分詞片語簡化任務：請在平板上將打散的分詞磁鐵重組！</div>` + 
+                                    `<div style="font-size:18pt; color:#777; margin-bottom:15px; font-style:italic;">原句提示：${quiz.raw1}</div>` +
+                                    `<div class="slot-large" id="target-slot" style="width:750px; height:80px; background:#e3f2fd; border-color:#29b6f6; color:#0288d1;">？ 等待學生平板完成卡位重組</div>`;
                 return;
             }
 
@@ -215,10 +217,10 @@
                             if (clausePhrase) { finalHtml = quiz.full.replace(clausePhrase[0], `<span class="highlight-clause">${clausePhrase[0]}</span>`); }
                             display.innerHTML = finalHtml; 
                         }
-                    } else if (quiz.type === 4 || quiz.type === 3) {
+                    } else if (quiz.type === 4 || quiz.type === 3 || quiz.type === 5 || quiz.type === 6) {
                         if (slot) {
-                            slot.className = "highlight-clause"; slot.style.fontSize = "24pt";
-                            slot.innerText = quiz.type === 4 ? data.card.replace(/,/g, ' ') : data.card;
+                            slot.className = "highlight-clause"; slot.style.fontSize = "24pt"; slot.style.width = "auto"; slot.style.height = "auto";
+                            slot.innerText = (quiz.type === 4 || quiz.type === 6) ? data.card.replace(/,/g, ' ') : data.card;
                         }
                     } else {
                         const container = document.getElementById('interactive-container');
@@ -236,7 +238,6 @@
             document.getElementById('winner-banner').innerText = `🏆 搶答成功！恭喜【${winnerName}】獲得 10 分！`;
             document.getElementById('winner-banner').style.display = 'block'; document.getElementById('next-btn').style.display = 'block';
             roomRef.update({ answered: true, winner: winnerName });
-            
             confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0 } });
             confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1 } });
         }
@@ -289,73 +290,38 @@
             } catch (e) { console.log(e); }
         }
 
-        // 🌟 核心更新：清空當前結算、隱藏橫條、將大螢幕切回「設定面板」，並保留學生分數！
         function resetToGameRoom() {
             document.getElementById('game-play-ui').style.display = 'none';
             document.getElementById('setup-ui').style.display = 'block';
-            
-            // 同步將 Firebase 的房間狀態轉回「準備中」，通知所有連線學生待命
-            roomRef.update({
-                isStarted: false,
-                isEnded: false,
-                currentQuestion: 0,
-                answered: false,
-                winner: "",
-                currentAnsStr: "",
-                optionsStr: "",
-                fullSentenceText: ""
-            });
+            roomRef.update({ isStarted: false, isEnded: false, currentQuestion: 0, answered: false, winner: "", currentAnsStr: "", optionsStr: "", fullSentenceText: "" });
         }
 
         function showFinalLeaderboard() {
             document.getElementById('winner-banner').style.display = 'none';
             document.getElementById('next-btn').style.display = 'none';
-            
             const display = document.getElementById('game-play-ui').querySelector('.sentence-area');
             document.getElementById('q-progress').innerText = "🏁 競賽結束！最終成績結算排行";
             
             roomRef.child('students').once('value', (snapshot) => {
                 const students = snapshot.val() || {};
                 let finalScores = {};
-                
-                Object.keys(students).forEach(k => {
-                    finalScores[students[k].name] = students[k].score || 0;
-                });
-                
+                Object.keys(students).forEach(k => { finalScores[students[k].name] = students[k].score || 0; });
                 let sorted = Object.keys(finalScores).sort((a, b) => finalScores[b] - finalScores[a]);
                 
                 let html = `<div style="display:flex;flex-direction:column;align-items:center;width:100%;">
                                 <h2>🏆 關係子句魔法大賽・頒獎台 🏆</h2>
                                 <table class="rank-table">
-                                    <thead>
-                                        <tr>
-                                            <th>名次</th>
-                                            <th>組別姓名</th>
-                                            <th>總得分</th>
-                                        </tr>
-                                    </thead>
+                                    <thead><tr><th>名次</th><th>組別姓名</th><th>總得分</th></tr></thead>
                                     <tbody>`;
-                                    
                 sorted.forEach((name, idx) => {
                     let medal = idx === 0 ? '🥇 ' : (idx === 1 ? '🥈 ' : (idx === 2 ? '🥉 ' : ''));
-                    html += `<tr>
-                                <td>${medal}第 ${idx + 1} 名</td>
-                                <td><strong>${name}</strong></td>
-                                <td style="color:#d32f2f; font-weight:bold;">${finalScores[name]} 分</td>
-                             </tr>`;
+                    html += `<tr><td>${medal}第 ${idx + 1} 名</td><td><strong>${name}</strong></td><td style="color:#d32f2f; font-weight:bold;">${finalScores[name]} 分</td></tr>`;
                 });
-                
-                html += `</tbody></table>`;
-                
-                // 🚀 依照指定需求：按鈕名稱正名為「🔄 回到遊戲室」，並綁定 resetToGameRoom 函式
-                html += `<button class="btn btn-room" onclick="resetToGameRoom()">🔄 回到遊戲室</button></div>`;
-                
+                html += `</tbody></table><button class="btn btn-room" onclick="resetToGameRoom()">🔄 回到遊戲室</button></div>`;
                 display.innerHTML = html;
-
                 playCheersAudio();
 
-                let duration = 4 * 1000;
-                let end = Date.now() + duration;
+                let duration = 4 * 1000; let end = Date.now() + duration;
                 (function frame() {
                     confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0, y: 0.8 } });
                     confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1, y: 0.8 } });
