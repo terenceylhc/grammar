@@ -154,14 +154,19 @@
                     pad.appendChild(optBtn);
                 });
             } else if (type === 5 && optsStr) {
-                // 🌟 題型五面版：解鎖智慧發射相容驗證鎖
-                document.getElementById('game-guide').innerText = "⚡ 關係子句簡化為分詞片語：點擊正確分詞、搶答發射！";
+                // 🌟 題型五面版：關係子句簡化為分詞片語 - 修正為純字卡按鈕
+                document.getElementById('game-guide').innerText = "⚡ 關係子句簡化為分詞片語：請點選正確的分詞片語！";
                 submitBtn.style.display = 'none';
                 optsStr.split('##').forEach(optText => {
                     const optBtn = document.createElement('button'); optBtn.className = 'clause-option-btn';
-                    optBtn.style.borderColor = "#ab47bc"; optBtn.innerHTML = `🔮 分詞簡化發射 ➔ <strong>${optText}</strong>`;
+                    optBtn.style.borderColor = "#ab47bc"; 
+                    optBtn.style.textAlign = "center"; // 文字置中更好看
+                    optBtn.style.fontSize = "16pt";    // 放大字體提高點擊舒適度
+                    
+                    // 🚀 修正：移除「分詞簡化發射 ➔」
+                    optBtn.innerHTML = `📄 <strong>${optText}</strong>`;
+                    
                     optBtn.addEventListener('click', () => {
-                        // 🚀 核心修復：使用相容性陣列切割法核對答案，徹底封殺發射無反應 Bug！
                         const pureTarget = targetAnsStr.split(',')[0];
                         if (optText === pureTarget || optText === targetAnsStr) { 
                             studentRef.update({ success: true, card: optText }); 
