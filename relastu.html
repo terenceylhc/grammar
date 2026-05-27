@@ -13,16 +13,13 @@
         input { width: 80%; padding: 12px; font-size: 14pt; border: 2px solid #1a1a1a; border-radius: 8px; margin-bottom: 15px; text-align: center; }
         .btn { background: #ffd54f; border: 2px solid #1a1a1a; border-radius: 8px; padding: 12px 30px; font-size: 14pt; font-weight: bold; width: 85%; cursor: pointer; box-shadow: 2px 2px 0#1a1a1a; }
         
-        .pad-area {
-            background: #fafafa; border: 2px dashed #ccc; min-height: 240px; position: relative; margin-top: 15px; border-radius: 12px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; padding: 20px; box-sizing: border-box;
-        }
+        .pad-area { background: #fafafa; border: 2px dashed #ccc; min-height: 240px; position: relative; margin-top: 15px; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; padding: 20px; box-sizing: border-box; }
         .pad-area.flex-row { flex-direction: row; flex-wrap: wrap; }
         
         .word-token { padding: 8px 14px; font-size: 13pt; font-weight: bold; border: 2px solid #1a1a1a; border-radius: 8px; background: white; box-shadow: 2px 2px 0 #1a1a1a; cursor: pointer; }
         .word-token.selected { background-color: #fff59d; border-color: #fbc02d; transform: translate(1px, 1px); box-shadow: 1px 1px 0 #1a1a1a; }
         .clause-option-btn { width: 100%; padding: 15px 10px; font-size: 13pt; font-weight: bold; text-align: left; border: 3px solid #1a1a1a; border-radius: 12px; background: white; box-shadow: 3px 3px 0px #1a1a1a; cursor: pointer; box-sizing: border-box; }
-        .sort-token { width: 100%; padding: 12px; font-size: 14pt; font-weight: bold; border: 2px solid #1a1a1a; border-radius: 8px; background: #fffde7; box-shadow: 3px 3px 0 #1a1a1a; cursor: grab; text-align: center; box-sizing: border-box;}
+        .sort-token { width: 100%; padding: 12px; font-size: 13pt; font-weight: bold; border: 2px solid #1a1a1a; border-radius: 8px; background: #fffde7; box-shadow: 3px 3px 0 #1a1a1a; cursor: grab; text-align: center; box-sizing: border-box;}
         
         .card-row { display: flex; gap: 15px; justify-content: center; width: 100%; }
         .card { width: 100px; padding: 15px 0; font-size: 14pt; font-weight: bold; border: 3px solid #1a1a1a; border-radius: 12px; background: white; box-shadow: 3px 3px 0 #1a1a1a; text-align: center; touch-action: none; }
@@ -107,17 +104,13 @@
                                 document.getElementById('pad').style.pointerEvents = "none";
                                 document.getElementById('submit-t2-btn').disabled = true;
                                 if (data.winner === sName) {
-                                    document.getElementById('msg').style.color = '#2e7d32';
-                                    document.getElementById('msg').innerText = "❤️ 搶答成功！獲得 10 分！";
+                                    document.getElementById('msg').style.color = '#2e7d32'; document.getElementById('msg').innerText = "❤️ 搶答成功！獲得 10 分！";
                                 } else {
-                                    document.getElementById('msg').style.color = '#666';
-                                    document.getElementById('msg').innerText = `😱 被【${data.winner}】率先搶答走囉！`;
+                                    document.getElementById('msg').style.color = '#666'; document.getElementById('msg').innerText = `😱 被【${data.winner}】率先搶答走囉！`;
                                 }
                             } else {
-                                document.getElementById('msg').innerText = "";
-                                document.getElementById('submit-t2-btn').disabled = false;
-                                document.getElementById('pad').style.opacity = "1";
-                                document.getElementById('pad').style.pointerEvents = "auto";
+                                document.getElementById('msg').innerText = ""; document.getElementById('submit-t2-btn').disabled = false;
+                                document.getElementById('pad').style.opacity = "1"; document.getElementById('pad').style.pointerEvents = "auto";
                             }
                         }
                         if (data.isEnded) {
@@ -134,49 +127,57 @@
         });
 
         function setupInterface(type, fullText, optsStr) {
-            const pad = document.getElementById('pad');
-            const submitBtn = document.getElementById('submit-t2-btn');
+            const pad = document.getElementById('pad'); const submitBtn = document.getElementById('submit-t2-btn');
             pad.className = 'pad-area'; pad.innerHTML = '';
             if(sortableInstance) { sortableInstance.destroy(); sortableInstance = null; }
 
             if (type === 2 && fullText) {
                 pad.classList.add('flex-row');
-                document.getElementById('game-guide').innerText = "🎯 螢光筆任務：請點亮句子中「所有的關係子句單字」！";
+                document.getElementById('game-guide').innerText = "🎯 尋找修飾標靶：請點選出「所有的關係子句單字」！";
                 submitBtn.style.display = 'block';
-
-                const words = fullText.split(' ');
-                words.forEach(word => {
+                fullText.split(' ').forEach(word => {
                     const token = document.createElement('div'); token.className = 'word-token'; token.innerText = word;
-                    const matchKey = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,"");
-                    token.setAttribute('data-key', matchKey);
+                    token.setAttribute('data-key', word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,""));
                     token.addEventListener('click', () => { token.classList.toggle('selected'); });
                     pad.appendChild(token);
                 });
             } else if (type === 3 && optsStr) {
-                document.getElementById('game-guide').innerText = "🧩 文法思辨：請點擊最完整的關係子句發射！";
+                document.getElementById('game-guide').innerText = "🧩 文法拆解大師：請點擊合併最正確的關係子句！";
                 submitBtn.style.display = 'none';
-
-                const rawOptions = optsStr.split('##');
-                rawOptions.forEach(optText => {
+                optsStr.split('##').forEach(optText => {
                     const optBtn = document.createElement('button'); optBtn.className = 'clause-option-btn';
                     optBtn.innerHTML = `📄 <strong>${optText}</strong>`;
                     optBtn.addEventListener('click', () => {
                         if (optText === targetAnsStr) { studentRef.update({ success: true, card: optText }); } 
-                        else {
-                            document.getElementById('msg').style.color = '#d32f2f'; document.getElementById('msg').innerText = "❌ 結構有文法錯誤喔，再想想看！";
-                            setTimeout(() => { document.getElementById('msg').innerText = ""; }, 2000);
-                        }
+                        else { alertWrong("❌ 結構有文法錯誤喔，再想想看！"); }
                     });
                     pad.appendChild(optBtn);
                 });
-            } else if (type === 4 && optsStr) {
-                document.getElementById('game-guide').innerText = "🧲 語順重組：請上下拖曳調換字塊，排出正確句子！";
+            } else if (type === 5 && optsStr) {
+                // 🌟 題型五面版：關係子句簡化為分詞片語 - 智慧發射按鈕
+                document.getElementById('game-guide').innerText = "⚡ 關係子句簡化為分詞片語：點擊正確分詞、搶答發射！";
+                submitBtn.style.display = 'none';
+                optsStr.split('##').forEach(optText => {
+                    const optBtn = document.createElement('button'); optBtn.className = 'clause-option-btn';
+                    optBtn.style.borderColor = "#ab47bc"; optBtn.innerHTML = `🔮 分詞簡化發射 ➔ <strong>${optText}</strong>`;
+                    optBtn.addEventListener('click', () => {
+                        if (optText === targetAnsStr) { studentRef.update({ success: true, card: optText }); } 
+                        else { alertWrong("❌ 分詞主被動判斷錯誤，請重新校對！"); }
+                    });
+                    pad.appendChild(optBtn);
+                });
+            } else if ((type === 4 || type === 6) && optsStr) {
+                // 🌟 題型六與題型四：共用磁鐵重組引擎
+                if(type === 6) {
+                    document.getElementById('game-guide').innerText = "🧲 關係子句簡化為分詞片語：請上下拖曳字塊，排出正確的分詞片語簡化句！";
+                } else {
+                    document.getElementById('game-guide').innerText = "🧲 高級排列組合：請上下拖曳字塊，排出正確句子！";
+                }
                 submitBtn.style.display = 'block';
-
-                const tokens = optsStr.split('##');
-                tokens.sort(() => Math.random() - 0.5);
+                const tokens = optsStr.split('##'); tokens.sort(() => Math.random() - 0.5);
                 tokens.forEach(tokText => {
                     const block = document.createElement('div'); block.className = 'sort-token'; block.innerText = tokText;
+                    if(type === 6) block.style.background = "#e3f2fd";
                     pad.appendChild(block);
                 });
                 sortableInstance = new Sortable(pad, { animation: 150 });
@@ -192,28 +193,18 @@
 
         document.getElementById('submit-t2-btn').addEventListener('click', () => {
             if (currentTypeKey.endsWith('_2')) {
-                const selectedTokens = document.querySelectorAll('.word-token.selected');
-                const selectedKeys = Array.from(selectedTokens).map(t => t.getAttribute('data-key'));
-                if (selectedKeys.join(',') === targetAnsStr) { studentRef.update({ success: true }); } 
-                else { alertWrong(); }
-            } else if (currentTypeKey.endsWith('_4')) {
-                const sortedBlocks = document.querySelectorAll('.sort-token');
-                const studentOrder = Array.from(sortedBlocks).map(b => b.innerText).join(',');
-                
-                // 🚀 核心升級：將大螢幕送過來的答案字串依 "||" 切開成合法陣列，只要學生拼出任一種就過關！
-                const legalAnswers = targetAnsStr.split('||');
-                
-                if (legalAnswers.includes(studentOrder)) { 
-                    studentRef.update({ success: true, card: studentOrder }); 
-                } else { 
-                    alertWrong(); 
-                }
+                const selectedKeys = Array.from(document.querySelectorAll('.word-token.selected')).map(t => t.getAttribute('data-key'));
+                if (selectedKeys.join(',') === targetAnsStr) { studentRef.update({ success: true }); } else { alertWrong("❌ 範圍不正確，請重新校對！"); }
+            } else if (currentTypeKey.endsWith('_4') || currentTypeKey.endsWith('_6')) {
+                const studentOrder = Array.from(document.querySelectorAll('.sort-token')).map(b => b.innerText).join(',');
+                if (targetAnsStr.split('||').includes(studentOrder)) { studentRef.update({ success: true, card: studentOrder }); } 
+                else { alertWrong("❌ 語順不正確，請再調換一下字塊！"); }
             }
         });
 
-        function alertWrong() {
-            document.getElementById('msg').style.color = '#d32f2f'; document.getElementById('msg').innerText = "❌ 語順或範圍不正確，請再校對一下！";
-            setTimeout(() => { document.getElementById('msg').innerText = ""; }, 2000);
+        function alertWrong(warningText) {
+            document.getElementById('msg').style.color = '#d32f2f'; document.getElementById('msg').innerText = warningText;
+            setTimeout(() => { document.getElementById('msg').innerText = ""; }, 2200);
         }
 
         function initPointerControls() {
@@ -241,16 +232,13 @@
                     const val = card.getAttribute('data-val');
                     if (parseInt(card.style.top) < 20) {
                         if (targetAnsStr.split(',').includes(val)) { studentRef.update({ success: true, card: val }); } 
-                        else { alertWrong(); resetCards(); }
+                        else { alertWrong("❌ 關代選錯囉，請再想想！"); resetCards(); }
                     } else { resetCards(); }
                 });
             });
         }
 
-        function resetCards() {
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => { card.style.position = 'relative'; card.style.left = '0px'; card.style.top = '0px'; });
-        }
+        function resetCards() { document.querySelectorAll('.card').forEach(card => { card.style.position = 'relative'; card.style.left = '0px'; card.style.top = '0px'; }); }
     </script>
 </body>
 </html>
