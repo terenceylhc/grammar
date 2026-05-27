@@ -1,6 +1,6 @@
-// 🌟 關係子句 4 種題型各 30 題，共 120 題（題型四支援智慧雙答案驗證鎖）
+// 🌟 關係子句 + 分詞簡化片語，6種題型各 25 題（總共 150 題終極題庫晶片）
 const totalPool = [
-    // === 題型一：基礎填空 (1-30 題) ===
+    // === 題型一：基礎關代填空 (1-25 題) ===
     { type: 1, before: "Andrew lost ", antecedent: "the hat", clause: "was given by Sharon.", ans: ["which", "that"] },
     { type: 1, before: "My mom likes to watch ", antecedent: "dramas", clause: "talk about family matters.", ans: ["which", "that"] },
     { type: 1, before: "The boy ", antecedent: "the boy", after: " is my brother.", clause: "is standing by the door", ans: ["who", "that"], isEmbed: true },
@@ -26,13 +26,8 @@ const totalPool = [
     { type: 1, before: "The jacket ", antecedent: "the jacket", after: " is made of leather.", clause: "is hanging in the closet", ans: ["which", "that"], isEmbed: true },
     { type: 1, before: "The scientist ", antecedent: "the scientist", after: " gave an inspiring speech.", clause: "discovered the new virus", ans: ["who", "that"], isEmbed: true },
     { type: 1, before: "He tells stories ", antecedent: "stories", clause: "sound completely unbelievable.", ans: ["which", "that"] },
-    { type: 1, before: "The river ", antecedent: "the river", after: " flows through the city is polluted.", clause: "runs behind the factory", ans: ["which", "that"], isEmbed: true },
-    { type: 1, before: "The bakery ", antecedent: "the bakery", clause: "sells traditional French bread is very popular.", ans: ["which", "that"] },
-    { type: 1, before: "The police arrested the thief ", antecedent: "the thief", clause: "stole the diamond ring.", ans: ["who", "that"] },
-    { type: 1, before: "The bus ", antecedent: "the bus", after: " was completely full.", clause: "goes to the airport", ans: ["which", "that"], isEmbed: true },
-    { type: 1, before: "The lady ", antecedent: "the lady", after: " waved hello to us.", clause: "was driving the red sports car", ans: ["who", "that"], isEmbed: true },
 
-    // === 題型二：尋找修飾標靶 (31-60 題) ===
+    // === 題型二：尋找修飾標靶 (26-50 題) ===
     { type: 2, full: "The woman who is listening to music is an actress.", target: "who,is,listening,to,music" },
     { type: 2, full: "A crowd of people who gathered in the square were there for the event.", target: "who,gathered,in,the,square" },
     { type: 2, full: "I cannot find the keys which open the back door.", target: "which,open,the,back,door" },
@@ -58,13 +53,8 @@ const totalPool = [
     { type: 2, full: "The machine that prints the labels is out of order.", target: "that,prints,the,labels" },
     { type: 2, full: "The flight which goes to New York has been delayed.", target: "which,goes,to,New,York" },
     { type: 2, full: "The uniform that is worn by the staff looks very elegant.", target: "that,is,worn,by,the,staff" },
-    { type: 2, full: "The man who fixed our air conditioner was very professional.", target: "who,fixed,our,air,conditioner" },
-    { type: 2, full: "The dog which won the competition is a golden retriever.", target: "which,won,the,competition" },
-    { type: 2, full: "The bridge that connects the two islands is made of steel.", target: "that,connects,the,two,islands" },
-    { type: 2, full: "The woman who is sitting near the window looks lonely.", target: "who,is,sitting,near,the,window" },
-    { type: 2, full: "The flowers which bloom in spring look absolutely beautiful.", target: "which,bloom,in,spring" },
 
-    // === 題型三：文法拆解大師 (61-90 題) ===
+    // === 題型三：文法拆解大師 (51-75 題) ===
     { type: 3, raw1: "I bought a book.", raw2: "It has many beautiful pictures.", before: "I bought a book ", options: ["which has many beautiful pictures.", "who has many beautiful pictures.", "has many beautiful pictures."], ans: "which has many beautiful pictures." },
     { type: 3, raw1: "I know a girl.", raw2: "She speaks four languages.", before: "I know a girl ", options: ["who speaks four languages.", "which speaks four languages.", "speaks four languages."], ans: "who speaks four languages." },
     { type: 3, raw1: "This is the bus.", raw2: "It goes to the station.", before: "This is the bus ", options: ["which goes to the station.", "who goes to the station.", "goes to the station."], ans: "which goes to the station." },
@@ -90,15 +80,8 @@ const totalPool = [
     { type: 3, raw1: "The shoes are tight.", raw2: "I bought them yesterday.", before: "The shoes ", after: " are tight.", options: ["which were bought yesterday", "who were bought yesterday", "were bought yesterday"], ans: "which were bought yesterday", isEmbed: true },
     { type: 3, raw1: "The people were friendly.", raw2: "They welcomed us.", before: "The people ", after: " were friendly.", options: ["who welcomed us", "which welcomed us", "welcomed us"], ans: "who welcomed us", isEmbed: true },
     { type: 3, raw1: "The contract was signed.", raw2: "It binds the two firms.", before: "The contract ", after: " was signed.", options: ["which binds the two firms", "who binds the two firms", "binds the two firms"], ans: "which binds the two firms", isEmbed: true },
-    { type: 3, raw1: "He adopted a puppy.", raw2: "It has floppy brown ears.", before: "He adopted a puppy ", options: ["which has floppy brown ears.", "who has floppy brown ears.", "has floppy brown ears."], ans: "which has floppy brown ears." },
-    { type: 3, raw1: "The woman was polite.", raw2: "She answered the phone.", before: "The woman ", after: " was polite.", options: ["who answered the phone", "which answered the phone", "answered the phone"], ans: "who answered the phone", isEmbed: true },
-    { type: 3, raw1: "This is the map.", raw2: "It shows the secret path.", before: "This is the map ", options: ["which shows the secret path.", "who shows the secret path.", "shows the secret path."], ans: "which shows the secret path." },
-    { type: 3, raw1: "The workers are tired.", raw2: "They built the brick wall.", before: "The workers ", after: " are tired.", options: ["who built the brick wall", "which built the brick wall", "built the brick wall"], ans: "who built the brick wall", isEmbed: true },
-    { type: 3, raw1: "I want to see the painting.", raw2: "It won first prize.", before: "I want to see the painting ", options: ["which won first prize.", "who won first prize.", "won first prize."], ans: "which won first prize." },
-    { type: 3, raw1: "The lawyer represents our team.", raw2: "She is wise.", before: "The lawyer ", after: " represents our team.", options: ["who is wise", "which is wise", "is wise"], ans: "who is wise", isEmbed: true },
 
-    // === 題型四：終極磁鐵字卡重組 (91-120 題) ===
-    // 🚀 核心優化：凡是能雙向合併的插入型題目，在 ans 欄位使用 "||" 分開，前後語順皆判定合法！
+    // === 題型四：高級排列組合 (76-100 題) ===
     { type: 4, raw1: "I know a girl.", raw2: "She speaks four languages.", tokens: ["I know a girl", "who", "speaks four languages."], ans: "I know a girl,who,speaks four languages." },
     { type: 4, raw1: "This is the bus.", raw2: "It goes to the station.", tokens: ["This is the bus", "which", "goes to the station."], ans: "This is the bus,which,goes to the station." },
     { type: 4, raw1: "The man cooked dinner.", raw2: "He is a chef.", tokens: ["The man", "who", "cooked dinner", "is a chef."], ans: "The man,who,cooked dinner,is a chef.||The man,who,is a chef,cooked dinner" },
@@ -118,15 +101,66 @@ const totalPool = [
     { type: 4, raw1: "This is the photo.", raw2: "It reminds me of summer.", tokens: ["This is the photo", "which", "reminds me of summer."], ans: "This is the photo,which,reminds me of summer." },
     { type: 4, raw1: "The firemen were brave.", raw2: "They put out the fire.", tokens: ["The firemen", "who", "put out the fire", "were brave."], ans: "The firemen,who,put out the fire,were brave.||The firemen,who,were brave,put out the fire" },
     { type: 4, raw1: "He lost the wallet.", raw2: "It contained his ID card.", tokens: ["He lost the wallet", "which", "contained his ID card."], ans: "He lost the wallet,which,contained his ID card." },
-    { type: 4, raw1: "The cake was delicious.", raw2: "It had fresh strawberries.", tokens: ["The cake", "which", "had fresh strawberries", "was delicious."], ans: "The cake,which,had fresh strawberries,was delicious.||The cake,which,was delicious,had fresh strawberries" }, // 📌 您抓到的這題！完美包容雙解！
+    { type: 4, raw1: "The cake was delicious.", raw2: "It had fresh strawberries.", tokens: ["The cake", "which", "had fresh strawberries", "was delicious."], ans: "The cake,which,had fresh strawberries,was delicious.||The cake,which,was delicious,had fresh strawberries" },
     { type: 4, raw1: "I know the dentist.", raw2: "He pulled out your tooth.", tokens: ["I know the dentist", "who", "pulled out your tooth."], ans: "I know the dentist,who,pulled out your tooth." },
     { type: 4, raw1: "The shoes are tight.", raw2: "I bought them yesterday.", tokens: ["The shoes", "which", "were bought yesterday", "are tight."], ans: "The shoes,which,were bought yesterday,are tight.||The shoes,which,are tight,were bought yesterday" },
     { type: 4, raw1: "The people were friendly.", raw2: "They welcomed us.", tokens: ["The people", "who", "welcomed us", "were friendly."], ans: "The people,who,welcomed us,were friendly.||The people,who,were friendly,welcomed us" },
     { type: 4, raw1: "The contract was signed.", raw2: "It binds the two firms.", tokens: ["The contract", "which", "binds the two firms", "was signed."], ans: "The contract,which,binds the two firms,was signed.||The contract,which,was signed,binds the two firms" },
     { type: 4, raw1: "He adopted a puppy.", raw2: "It has floppy brown ears.", tokens: ["He adopted a puppy", "which", "has floppy brown ears."], ans: "He adopted a puppy,which,has floppy brown ears." },
-    { type: 4, raw1: "The woman was polite.", raw2: "She answered the phone.", tokens: ["The woman", "who", "answered the phone", "was polite."], ans: "The woman,who,answered the phone,was polite.||The woman,who,was polite,answered the phone" },
-    { type: 4, raw1: "This is the map.", raw2: "It shows the secret path.", tokens: ["This is the map", "which", "shows the secret path."], ans: "This is the map,which,shows the secret path." },
-    { type: 4, raw1: "The workers are tired.", raw2: "They built the brick wall.", tokens: ["The workers", "who", "built the brick wall", "are tired."], ans: "The workers,who,built the brick wall,are tired.||The workers,who,are tired,built the brick wall" },
-    { type: 4, raw1: "I want to see the painting.", raw2: "It won first prize.", tokens: ["I want to see the painting", "which", "won first prize."], ans: "I want to see the painting,which,won first prize." },
-    { type: 4, raw1: "The lawyer represents our team.", raw2: "She is wise.", tokens: ["The lawyer", "who", "is wise", "represents our team."], ans: "The lawyer,who,is wise,represents our team.||The lawyer,who,represents our team,is wise" }
+
+    // === 🌟 題型五：關係子句簡化為分詞片語 - 觀念發射法 (101-125 題) ===
+    // 💡 設計：大螢幕挖空 [ ❓ ]，提供 3 個分詞按鈕給學生平板進行秒殺搶答
+    { type: 5, before: "I know a girl [ ❓ ] four languages.", options: ["speaking", "spoken", "speaks"], ans: "speaking" },
+    { type: 5, before: "The man [ ❓ ] next door is a famous chef.", options: ["living", "lived", "lives"], ans: "living" },
+    { type: 5, before: "Students [ ❓ ] to pass the exam must study hard.", options: ["wanting", "wanted", "wants"], ans: "wanting" },
+    { type: 5, before: "The bus [ ❓ ] to the airport leaves every ten minutes.", options: ["going", "gone", "goes"], ans: "going" },
+    { type: 5, before: "People [ ❓ ] lies to their friends will lose trust.", options: ["telling", "told", "tells"], ans: "telling" },
+    { type: 5, before: "The river [ ❓ ] behind the factory is highly polluted.", options: ["running", "run", "runs"], ans: "running" },
+    { type: 5, before: "She works for a company [ ❓ ] medical equipment.", options: ["making", "made", "makes"], ans: "making" },
+    { type: 5, before: "The road [ ❓ ] the two towns is very narrow.", options: ["connecting", "connected", "connects"], ans: "connecting" },
+    { type: 5, before: "Anyone [ ❓ ] the school rules will be punished.", options: ["breaking", "broken", "breaks"], ans: "breaking" },
+    { type: 5, before: "The guard [ ❓ ] at the gate checks everyone's ID.", options: ["standing", "stood", "stands"], ans: "standing" },
+    { type: 5, before: "Andrew lost the hat [ ❓ ] by Sharon.", options: ["given", "giving", "gives"], ans: "given" },
+    { type: 5, before: "The multi-touch screen [ ❓ ] recently is amazing.", options: ["invented", "inventing", "invents"], ans: "invented" },
+    { type: 5, before: "The cake [ ❓ ] by my sister tasted sweet.", options: ["made", "making", "makes"], ans: "made" },
+    { type: 5, before: "The report [ ❓ ] by Tom contains many mistakes.", options: ["written", "writing", "writes"], ans: "written" },
+    { type: 5, before: "The jacket [ ❓ ] of leather is hanging in the closet.", options: ["made", "making", "makes"], ans: "made" },
+    { type: 5, before: "The uniform [ ❓ ] by the staff looks very elegant.", options: ["worn", "wearing", "wears"], ans: "worn" },
+    { type: 5, before: "The book [ ❓ ] by a local author won first prize.", options: ["written", "writing", "writes"], ans: "written" },
+    { type: 5, before: "The house [ ❓ ] in the fire stood on the hill.", options: ["destroyed", "destroying", "destroys"], ans: "destroyed" },
+    { type: 5, before: "Cars [ ❓ ] from Germany are more expensive.", options: ["imported", "importing", "imports"], ans: "imported" },
+    { type: 5, before: "The artifacts [ ❓ ] in the museum attract many tourists.", options: ["displayed", "displaying", "displays"], ans: "displayed" },
+    { type: 5, before: "The boy [ ❓ ] by the door is my brother.", options: ["standing", "stood", "stands"], ans: "standing" },
+    { type: 5, before: "The girls [ ❓ ] under the tree are laughing.", options: ["sitting", "sat", "sits"], ans: "sitting" },
+    { type: 5, before: "Look at the dog [ ❓ ] at the mailman.", options: ["barking", "barked", "barks"], ans: "barking" },
+    { type: 5, before: "Do you know the gentleman [ ❓ ] a black suit?", options: ["wearing", "worn", "wears"], ans: "wearing" },
+    { type: 5, before: "The woman [ ❓ ] near the window looks lonely.", options: ["sitting", "sat", "sits"], ans: "sitting" },
+
+    // === 🌟 題型六：關係子句簡化為分詞片語 - 磁鐵重組法 (126-150 題) ===
+    // 💡 設計：大螢幕秀出原完整提示句，平板給予去除關代與 be 的大型簡化磁鐵進行卡位重組
+    { type: 6, raw1: "I waved to passengers who were waving from the train.", tokens: ["I waved to passengers", "waving from the train."], ans: "I waved to passengers,waving from the train." },
+    { type: 6, raw1: "The birds which were singing outside woke me up.", tokens: ["The birds", "singing outside", "woke me up."], ans: "The birds,singing outside,woke me up." },
+    { type: 6, raw1: "The baby who was crying just now fell asleep.", tokens: ["The baby", "crying just now", "fell asleep."], ans: "The baby,crying just now,fell asleep." },
+    { type: 6, raw1: "The police want the man who is running away in a jacket.", tokens: ["The police want the man", "running away in a jacket."], ans: "The police want the man,running away in a jacket." },
+    { type: 6, raw1: "The stars which are shining in the sky look bright.", tokens: ["The stars", "shining in the sky", "look bright."], ans: "The stars,shining in the sky,look bright." },
+    { type: 6, raw1: "The uniform that is worn by the staff looks elegant.", tokens: ["The uniform", "worn by the staff", "looks elegant."], ans: "The uniform,worn by the staff,looks elegant." },
+    { type: 6, raw1: "The book which was written by a local author won.", tokens: ["The book", "written by a local author", "won."], ans: "The book,written by a local author,won." },
+    { type: 6, raw1: "The house which was destroyed in the fire stood here.", tokens: ["The house", "destroyed in the fire", "stood here."], ans: "The house,destroyed in the fire,stood here." },
+    { type: 6, raw1: "Cars which are imported from Germany are costly.", tokens: ["Cars", "imported from Germany", "are costly."], ans: "Cars,imported from Germany,are costly." },
+    { type: 6, raw1: "Artifacts which are displayed in the museum attract fans.", tokens: ["Artifacts", "displayed in the museum", "attract fans."], ans: "Artifacts,displayed in the museum,attract fans." },
+    { type: 6, raw1: "The river which runs behind the factory is polluted.", tokens: ["The river", "running behind the factory", "is polluted."], ans: "The river,running behind the factory,is polluted." },
+    { type: 6, raw1: "She works for a company which makes medical equipment.", tokens: ["She works for a company", "making medical equipment."], ans: "She works for a company,making medical equipment." },
+    { type: 6, raw1: "The road which connects the two towns is narrow.", tokens: ["The road", "connecting the two towns", "is narrow."], ans: "The road,connecting the two towns,is narrow." },
+    { type: 6, raw1: "Anyone who breaks the rules will be punished.", tokens: ["Anyone", "breaking the rules", "will be punished."], ans: "Anyone,breaking the rules,will be punished." },
+    { type: 6, raw1: "The guard who stands at the gate checks IDs.", tokens: ["The guard", "standing at the gate", "checks IDs."], ans: "The guard,standing at the gate,checks IDs." },
+    { type: 6, raw1: "The boy who is standing by the door is my brother.", tokens: ["The boy", "standing by the door", "is my brother."], ans: "The boy,standing by the door,is my brother." },
+    { type: 6, raw1: "The girls who are sitting under the tree are laughing.", tokens: ["The girls", "sitting under the tree", "are laughing."], ans: "The girls,sitting under the tree,are laughing." },
+    { type: 6, raw1: "Look at the dog which is barking at the mailman.", tokens: ["Look at the dog", "barking at the mailman."], ans: "Look at the dog,barking at the mailman." },
+    { type: 6, raw1: "Do you know the gentleman who is wearing a black suit?", tokens: ["Do you know the gentleman", "wearing a black suit?"], ans: "Do you know the gentleman,wearing a black suit?" },
+    { type: 6, raw1: "The woman who is sitting near the window looks lonely.", tokens: ["The woman", "sitting near the window", "looks lonely."], ans: "The woman,sitting near the window,looks lonely." },
+    { type: 6, raw1: "The cake that was made by my sister tasted sweet.", tokens: ["The cake", "made by my sister", "tasted sweet."], ans: "The cake,made by my sister,tasted sweet." },
+    { type: 6, raw1: "The report which was written by Tom contains mistakes.", tokens: ["The report", "written by Tom", "contains mistakes."], ans: "The report,written by Tom,contains mistakes." },
+    { type: 6, raw1: "The jacket which is made of leather is in the closet.", tokens: ["The jacket", "made of leather", "is in the closet."], ans: "The jacket,made of leather,is in the closet." },
+    { type: 6, raw1: "I know a girl who speaks four languages.", tokens: ["I know a girl", "speaking four languages."], ans: "I know a girl,speaking four languages." },
+    { type: 6, raw1: "The man who lives next door is a famous chef.", tokens: ["The man", "leaving next door", "is a famous chef."], ans: "The man,leaving next door,is a famous chef." }
 ];
