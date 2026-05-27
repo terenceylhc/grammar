@@ -19,7 +19,7 @@
         .word-token { padding: 8px 14px; font-size: 13pt; font-weight: bold; border: 2px solid #1a1a1a; border-radius: 8px; background: white; box-shadow: 2px 2px 0 #1a1a1a; cursor: pointer; }
         .word-token.selected { background-color: #fff59d; border-color: #fbc02d; transform: translate(1px, 1px); box-shadow: 1px 1px 0 #1a1a1a; }
         .clause-option-btn { width: 100%; padding: 15px 10px; font-size: 13pt; font-weight: bold; text-align: left; border: 3px solid #1a1a1a; border-radius: 12px; background: white; box-shadow: 3px 3px 0px #1a1a1a; cursor: pointer; box-sizing: border-box; }
-        .sort-token { width: 100%; padding: 12px; font-size: 13pt; font-weight: bold; border: 2px solid #1a1a1a; border-radius: 8px; background: #fffde7; box-shadow: 3px 3px 0 #1a1a1a; cursor: grab; text-align: center; box-sizing: border-box;}
+        .sort-token { width: 100%; padding: 12px; font-size: 13pt; font-weight: bold; border: 2px solid #1a1a1a; border-radius: 8px; background: #fffde7; box-shadow: 3px 3px 0 #1a1a1a; cursor: grab; text-align: center; box-sizing: border-box; touch-action: none; }
         
         .card-row { display: flex; gap: 15px; justify-content: center; width: 100%; }
         .card { width: 100px; padding: 15px 0; font-size: 14pt; font-weight: bold; border: 3px solid #1a1a1a; border-radius: 12px; background: white; box-shadow: 3px 3px 0 #1a1a1a; text-align: center; touch-action: none; }
@@ -115,7 +115,7 @@
                         }
                         if (data.isEnded) {
                             document.getElementById('pad').style.opacity = "0.5"; document.getElementById('pad').style.pointerEvents = "none";
-                            document.getElementById('game-guide').innerText = "🏁 比賽結束！請看大螢幕！";
+                            document.getElementById('game-guide').innerText = "🏁 比賽結束！請看大螢幕排行榜！";
                         } else if (!data.isStarted) {
                             document.getElementById('pad').style.opacity = "0.5"; document.getElementById('pad').style.pointerEvents = "none";
                             document.getElementById('game-guide').innerText = "🔄 老師已將遊戲室重置，正在準備下一回合，請待命..."; 
@@ -154,33 +154,46 @@
                     pad.appendChild(optBtn);
                 });
             } else if (type === 5 && optsStr) {
-                // 🌟 題型五面版：關係子句簡化為分詞片語 - 智慧發射按鈕
+                // 🌟 題型五面版：解鎖智慧發射相容驗證鎖
                 document.getElementById('game-guide').innerText = "⚡ 關係子句簡化為分詞片語：點擊正確分詞、搶答發射！";
                 submitBtn.style.display = 'none';
                 optsStr.split('##').forEach(optText => {
                     const optBtn = document.createElement('button'); optBtn.className = 'clause-option-btn';
                     optBtn.style.borderColor = "#ab47bc"; optBtn.innerHTML = `🔮 分詞簡化發射 ➔ <strong>${optText}</strong>`;
                     optBtn.addEventListener('click', () => {
-                        if (optText === targetAnsStr) { studentRef.update({ success: true, card: optText }); } 
-                        else { alertWrong("❌ 分詞主被動判斷錯誤，請重新校對！"); }
+                        // 🚀 核心修復：使用相容性陣列切割法核對答案，徹底封殺發射無反應 Bug！
+                        const pureTarget = targetAnsStr.split(',')[0];
+                        if (optText === pureTarget || optText === targetAnsStr) { 
+                            studentRef.update({ success: true, card: optText }); 
+                        } else { 
+                            alertWrong("❌ 分詞主被動判斷錯誤，請重新校對！"); 
+                        }
                     });
                     pad.appendChild(optBtn);
                 });
             } else if ((type === 4 || type === 6) && optsStr) {
-                // 🌟 題型六與題型四：共用磁鐵重組引擎
+                // 🌟 題型六與題型四：全面啟動最高規格 SortableJS 手機觸控引擎
                 if(type === 6) {
                     document.getElementById('game-guide').innerText = "🧲 關係子句簡化為分詞片語：請上下拖曳字塊，排出正確的分詞片語簡化句！";
                 } else {
                     document.getElementById('game-guide').innerText = "🧲 高級排列組合：請上下拖曳字塊，排出正確句子！";
                 }
                 submitBtn.style.display = 'block';
-                const tokens = optsStr.split('##'); tokens.sort(() => Math.random() - 0.5);
+                
+                const tokens = optsStr.split('##'); 
+                tokens.sort(() => Math.random() - 0.5);
                 tokens.forEach(tokText => {
                     const block = document.createElement('div'); block.className = 'sort-token'; block.innerText = tokText;
                     if(type === 6) block.style.background = "#e3f2fd";
                     pad.appendChild(block);
                 });
-                sortableInstance = new Sortable(pad, { animation: 150 });
+                
+                // 🚀 核心修復：強制在軟體層解鎖 HTML5 觸控拖動限制，保證 iPad 與手機 100% 能流暢拉動！
+                sortableInstance = new Sortable(pad, { 
+                    animation: 150,
+                    forceFallback: true,
+                    fallbackTolerance: 3
+                });
             } else {
                 document.getElementById('game-guide').innerText = "🚀 請按住關代卡片向上發射至大螢幕！";
                 submitBtn.style.display = 'none';
