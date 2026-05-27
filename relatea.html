@@ -175,8 +175,8 @@
 
             // 🌟 題型五：大螢幕挖空渲染
             if (quiz.type === 5) {
-                let renderedText = quiz.before.replace("[ ❓ ]", `<div class="slot-t5" id="target-slot">❓ 觀念發射</div>`);
-                display.innerHTML = `<div style="font-size:16pt; color:#ab47bc; margin-bottom:10px; font-weight:bold;">📝 請在平板上點擊正確的分詞片語進行發射！</div>` + `<div>${renderedText}</div>`;
+                let renderedText = quiz.before.replace("[ ❓ ]", `<div class="slot-t5" id="target-slot" style="width: 200px; border-color: #ab47bc; background: #f3e5f5; color: #7b1fa2;">❓ 點選填空</div>`);
+                display.innerHTML = `<div style="font-size:16pt; color:#ab47bc; margin-bottom:10px; font-weight:bold;">📝 關係子句簡化為分詞片語：請在平板上點選正確答案！</div>` + `<div>${renderedText}</div>`;
                 return;
             }
 
