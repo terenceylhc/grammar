@@ -28,28 +28,56 @@
         .teaching-board {
             background-color: #263238; border: 4px solid #1a1a1a; border-radius: 12px;
             padding: 25px; margin-bottom: 30px; box-shadow: 4px 4px 0px #1a1a1a; color: white;
+            position: relative;
         }
-        .teaching-board h3 { margin-top: 0; color: #ffd54f; border-bottom: 1px dashed #546e7a; padding-bottom: 8px; margin-bottom: 15px; }
-        .guide-tip { color: #ce93d8; font-size: 11pt; margin: -5px 0 15px 0; font-weight: bold; }
+        .board-header-zone {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px dashed #546e7a; padding-bottom: 10px; margin-bottom: 15px;
+        }
+        .teaching-board h3 { margin: 0; color: #ffd54f; }
         
+        /* 🌟 新增：講義主題切換按鈕群組 */
+        .theme-selector-group { display: flex; gap: 10px; }
+        .theme-select-btn {
+            background: #37474f; border: 2px solid #546e7a; color: #b0bec5;
+            padding: 6px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 10.5pt;
+        }
+        .theme-select-btn.active {
+            background: #ffd54f; border-color: #1a1a1a; color: #1a1a1a; box-shadow: 2px 2px 0px #000;
+        }
+
+        .guide-tip { color: #ce93d8; font-size: 11pt; margin: 0 0 15px 0; font-weight: bold; }
+        
+        /* 上下鐵軌托盤 */
         .board-line {
             display: flex; gap: 12px; align-items: center; padding: 12px 20px;
-            min-height: 70px; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box;
+            min-height: 80px; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box;
         }
         #line-a { background: #37474f; border: 2px dashed #4fc3f7; } 
         #line-b { background: #2d3d45; border: 2px dashed #ff8a80; } 
         
-        .line-label { font-size: 11pt; font-weight: bold; background: #1a1a1a; color: #b0bec5; padding: 4px 8px; border-radius: 4px; min-width: 75px; text-align: center; user-select: none; }
+        .line-label { font-size: 11pt; font-weight: bold; background: #1a1a1a; color: #b0bec5; padding: 4px 8px; border-radius: 4px; min-width: 85px; text-align: center; user-select: none; }
         
+        /* 基礎磁鐵字塊樣式 */
         .block-token {
             padding: 10px 16px; font-size: 14pt; font-weight: bold; color: #1a1a1a;
             background: #fffde7; border: 2px solid #1a1a1a; border-radius: 6px;
             box-shadow: 2px 2px 0px #000; cursor: grab; user-select: none;
         }
         .block-token:active { cursor: grabbing; }
-        .block-token.clause-style { background-color: #fff59d; border-color: #fbc02d; }
         .block-token.pronoun-style { background-color: #ffcdd2; cursor: pointer; } 
         .block-token.success-target { border-bottom: 5px double #e57373 !important; background-color: #ffebee; }
+
+        /* 形容詞子句一體化複合大區塊外殼 */
+        .merged-clause-block {
+            display: inline-flex; gap: 0px; align-items: center;
+            border: 2px solid #1a1a1a; border-radius: 8px; overflow: hidden;
+            box-shadow: 3px 3px 0px #000; cursor: grab; user-select: none;
+        }
+        .merged-clause-block:active { cursor: grabbing; }
+        
+        .clause-part-rel { padding: 10px 14px; font-size: 14pt; font-weight: bold; color: #1a1a1a; background-color: #e1bee7; border-right: 2px solid #1a1a1a; }
+        .clause-part-body { padding: 10px 16px; font-size: 14pt; font-weight: bold; color: #1a1a1a; background-color: #fff59d; }
 
         /* 3. 下：進入競賽遊戲室入口 */
         .game-zone {
@@ -68,7 +96,6 @@
         .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px #1a1a1a; }
         .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #1a1a1a; }
         
-        /* 🌟 新增：QR code 容器樣式 */
         .qr-wrapper {
             background-color: white; border: 3px solid #1a1a1a; border-radius: 12px;
             padding: 10px; margin-top: 15px; box-shadow: 3px 3px 0px #1a1a1a;
@@ -76,7 +103,6 @@
         }
         .qr-wrapper img { width: 100%; height: auto; display: block; }
         .qr-text { font-size: 10pt; color: #555; margin-top: 5px; font-weight: bold;}
-        
     </style>
 </head>
 <body>
@@ -102,20 +128,19 @@
         </div>
 
         <div class="teaching-board">
-            <h3>🏫 互動講義：動態句子合併示範黑板</h3>
-            <div class="guide-tip">💡 教學步驟：1. 先點擊第二行的紅色 <span style="background:#ffcdd2; color:#1a1a1a; padding:1px 5px; border-radius:4px;">It</span> 變身關代。2. 直接按住第二行的字塊，往上拖曳插入到第一行的正確修飾位置！</div>
-            
-            <div class="board-line" id="line-a">
-                <div class="line-label">主要句子 A</div>
-                <div class="block-token" id="token-cake" data-id="cake">The cake</div>
-                <div class="block-token" id="token-delicious" data-id="delicious">was delicious.</div>
+            <div class="board-header-zone">
+                <h3>🏫 互動講義：動態句子合併示範黑板</h3>
+                <div class="theme-selector-group">
+                    <button class="theme-select-btn active" id="btn-mode-1" onclick="switchExampleMode(1)">📌 階段一：先行詞在句尾</button>
+                    <button class="theme-select-btn" id="btn-mode-2" onclick="switchExampleMode(2)">📌 階段二：先行詞在句中 (插入句)</button>
+                </div>
             </div>
             
-            <div class="board-line" id="line-b">
-                <div class="line-label">次要句子 B</div>
-                <div class="block-token pronoun-style" id="it-token" data-id="it">It</div>
-                <div class="block-token" id="token-strawberries" data-id="strawberries">had fresh strawberries</div>
-            </div>
+            <div class="guide-tip" id="text-guide-tip">💡 完美合併步驟：1. 點擊第二行的紅色 It，整條形容詞子句會一體融合！2. 按住該區塊，搬運卡位到第一行句尾！</div>
+            
+            <div class="board-line" id="line-a"></div>
+            
+            <div class="board-line" id="line-b"></div>
         </div>
 
         <div class="game-zone">
@@ -125,7 +150,6 @@
                 <div class="btn-wrapper">
                     <a href="relatea.html" class="btn btn-teacher">🖥️ 我是老師 (大螢幕端)</a>
                 </div>
-                
                 <div class="btn-wrapper">
                     <a href="relastu.html" class="btn btn-student">📱 我是學生 (平板控制器)</a>
                     <div class="qr-wrapper">
@@ -138,21 +162,73 @@
     </div>
 
     <script>
+        let currentMode = 1;
         let isTransformed = false;
-        const itToken = document.getElementById('it-token');
-        const strawberriesToken = document.getElementById('token-strawberries');
-        const cakeToken = document.getElementById('token-cake');
-
-        itToken.addEventListener('click', () => {
-            if (!isTransformed) {
-                isTransformed = true;
-                itToken.innerText = "which / that";
-                itToken.className = "block-token clause-style";
-                strawberriesToken.className = "block-token clause-style";
-                confetti({ particleCount: 25, spread: 50, origin: { y: 0.5 } });
+        
+        // 雙主題磁鐵字塊庫數據晶片
+        const datasets = {
+            1: {
+                guide: "💡 完美合併步驟：1. 點擊第二行的紅色 It，整條形容詞子句會一體融合！2. 按住該區塊，往上搬運串接到第一行【句尾先行詞】後面！",
+                lineA: `<div class="line-label">主要句子 A</div><div class="block-token" id="tgt-hat" data-id="hat">Andrew lost the hat</div>`,
+                lineB: `<div class="line-label">次要句子 B</div><div class="block-token pronoun-style" id="it-token" data-id="it">It</div><div class="block-token" id="token-body" data-id="body">was given by Sharon.</div>`,
+                successOrder: "hat,clause-package",
+                relText: "which / that",
+                bodyText: "was given by Sharon."
+            },
+            2: {
+                guide: "💡 完美合併步驟：1. 點擊第二行的紅色 It，整條形容詞子句會一體融合！2. 按住該區塊，往上搬運【插入】到第一行先行詞與動詞中間！",
+                lineA: `<div class="line-label">主要句子 A</div><div class="block-token" id="tgt-cake" data-id="cake">The cake</div><div class="block-token" id="token-delicious" data-id="delicious">was delicious.</div>`,
+                lineB: `<div class="line-label">次要句子 B</div><div class="block-token pronoun-style" id="it-token" data-id="it">It</div><div class="block-token" id="token-body" data-id="body">had fresh strawberries</div>`,
+                successOrder: "cake,clause-package,delicious",
+                relText: "which / that",
+                bodyText: "had fresh strawberries"
             }
-        });
+        };
 
+        // 🌟 核心控制：初始化與更換主題例句功能
+        function switchExampleMode(modeNum) {
+            currentMode = modeNum;
+            isTransformed = false;
+            
+            // 變更按鈕點亮狀態
+            document.getElementById('btn-mode-1').className = `theme-select-btn ${modeNum === 1 ? 'active' : ''}`;
+            document.getElementById('btn-mode-2').className = `theme-select-btn ${modeNum === 2 ? 'active' : ''}`;
+            
+            // 替換指引與字塊內容
+            const config = datasets[modeNum];
+            document.getElementById('text-guide-tip').innerText = config.guide;
+            document.getElementById('line-a').innerHTML = config.lineA;
+            document.getElementById('line-b').innerHTML = config.lineB;
+            
+            // 重新綁定 It 的融合轉換點擊事件
+            bindClickTransformation();
+        }
+
+        function bindClickTransformation() {
+            const itToken = document.getElementById('it-token');
+            const lineB = document.getElementById('line-b');
+            
+            itToken.addEventListener('click', () => {
+                if (!isTransformed) {
+                    isTransformed = true;
+                    const config = datasets[currentMode];
+                    
+                    // 建立一體化外殼
+                    const mergedBlock = document.createElement('div');
+                    mergedBlock.className = 'merged-clause-block';
+                    mergedBlock.setAttribute('data-id', 'clause-package');
+                    mergedBlock.innerHTML = `<div class="clause-part-rel">${config.relText}</div><div class="clause-part-body">${config.bodyText}</div>`;
+                    
+                    // 抽換元件
+                    lineB.innerHTML = `<div class="line-label">次要句子 B</div>`;
+                    lineB.appendChild(mergedBlock);
+                    
+                    confetti({ particleCount: 25, spread: 50, origin: { y: 0.5 } });
+                }
+            });
+        }
+
+        // 🌟 跨行磁鐵自由重組排序機制
         const sortableOptions = {
             group: 'shared-blackboard',
             animation: 180,
@@ -163,19 +239,28 @@
                                           .filter(id => id !== null)
                                           .join(',');
 
-                if (currentOrder === "cake,it,strawberries,delicious") {
-                    if (isTransformed) {
-                        cakeToken.classList.add('success-target');
-                        confetti({ particleCount: 100, spread: 70, origin: { y: 0.5 } });
+                const config = datasets[currentMode];
+                
+                // 智慧判定當前模式是否過關
+                if (currentOrder === config.successOrder && isTransformed) {
+                    if (currentMode === 1) {
+                        document.getElementById('tgt-hat').classList.add('success-target');
+                    } else {
+                        document.getElementById('tgt-cake').classList.add('success-target');
                     }
+                    confetti({ particleCount: 100, spread: 70, origin: { y: 0.5 } });
                 } else {
-                    cakeToken.classList.remove('success-target');
+                    const targetEl = document.getElementById('tgt-hat') || document.getElementById('tgt-cake');
+                    if(targetEl) targetEl.classList.remove('success-target');
                 }
             }
         };
 
         new Sortable(document.getElementById('line-a'), sortableOptions);
         new Sortable(document.getElementById('line-b'), sortableOptions);
+
+        // 頁面初次加載預設啟動第一階段
+        switchExampleMode(1);
     </script>
 </body>
 </html>
