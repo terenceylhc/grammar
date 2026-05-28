@@ -24,6 +24,7 @@ const totalPool = [
     { type: 1, before: "The tree ", antecedent: "the tree", after: " blew down in the storm.", clause: "stood in front of the house", ans: ["which", "that"], isEmbed: true },
     { type: 1, before: "The children ", antecedent: "the children", after: " are playing in the park.", clause: "live in this neighborhood", ans: ["who", "that"], isEmbed: true },
     { type: 1, before: "She works for a company ", antecedent: "a company", clause: "makes medical equipment.", ans: ["which", "that"] },
+    // ⭕ 檢查並確保格式對等
     { type: 1, before: "The jacket ", antecedent: "the jacket", after: " is made of leather.", clause: "is hanging in the closet", ans: ["which", "that"], isEmbed: true },
     { type: 1, before: "The scientist ", antecedent: "the scientist", after: " gave an inspiring speech.", clause: "discovered the new virus", ans: ["who", "that"], isEmbed: true },
     { type: 1, before: "He tells stories ", antecedent: "stories", clause: "sound completely unbelievable.", ans: ["which", "that"] },
