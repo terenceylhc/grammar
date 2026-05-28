@@ -33,7 +33,7 @@
         .antecedent { border-bottom: 4px dashed #e57373; padding: 0 6px; font-weight: bold; background-color: rgba(229, 115, 115, 0.08); }
         .slot { width: 140px; height: 65px; border: 4px dashed #4fc3f7; border-radius: 10px; background: #e1f5fe; display: inline-flex; justify-content: center; align-items: center; font-size: 18pt; color: #0288d1; font-weight: bold; }
         .slot-large { width: 450px; height: 65px; border: 4px dashed #81c784; background: #e8f5e9; color: #2e7d32; border-radius: 10px; display: inline-flex; justify-content: center; align-items: center; font-size: 16pt; font-weight: bold;}
-        .slot-t5 { width: 180px; height: 60px; border: 3px dashed #ab47bc; background: #f3e5f5; color: #7b1fa2; border-radius: 8px; display: inline-flex; justify-content: center; align-items: center; font-size: 20pt; font-weight: bold; }
+        .slot-t5 { width: 200px; height: 60px; border: 3px dashed #ab47bc; background: #f3e5f5; color: #7b1fa2; border-radius: 8px; display: inline-flex; justify-content: center; align-items: center; font-size: 20pt; font-weight: bold; }
         .clause-skeleton { font-size: 24pt; color: #a1a1a1; border: 2px dashed #ccc; padding: 2px 10px; border-radius: 8px; background: #fafafa; }
         
         .highlight-clause { background-color: #fff59d; border: 2px solid #fbc02d; padding: 2px 12px; border-radius: 8px; animation: pop 0.3s ease-out; }
@@ -63,7 +63,6 @@
     </div>
 
     <div class="main-board" id="board">
-        <!-- ⚙️ 老師勾選面板 (已正名題型五、六包含指定字樣) -->
         <div class="setup-panel" id="setup-ui">
             <h2>⚙️ 課堂競賽設定 (150題 豪華六合一版)</h2>
             <p style="color: #666;">勾選開啟題型，系統會自動從題庫跨單元調配 10 題進行混合大決戰！</p>
@@ -173,14 +172,12 @@
                 return;
             }
 
-            // 🌟 題型五：大螢幕挖空渲染
             if (quiz.type === 5) {
                 let renderedText = quiz.before.replace("[ ❓ ]", `<div class="slot-t5" id="target-slot" style="width: 200px; border-color: #ab47bc; background: #f3e5f5; color: #7b1fa2;">❓ 點選填空</div>`);
                 display.innerHTML = `<div style="font-size:16pt; color:#ab47bc; margin-bottom:10px; font-weight:bold;">📝 關係子句簡化為分詞片語：請在平板上點選正確答案！</div>` + `<div>${renderedText}</div>`;
                 return;
             }
 
-            // 🌟 題型六：大螢幕完整原句提示
             if (quiz.type === 6) {
                 display.innerHTML = `<div style="font-size:16pt; color:#01579b; margin-bottom:10px; font-weight:bold;">🧲 分詞片語簡化任務：請在平板上將打散的分詞磁鐵重組！</div>` + 
                                     `<div style="font-size:18pt; color:#777; margin-bottom:15px; font-style:italic;">原句提示：${quiz.raw1}</div>` +
@@ -188,10 +185,25 @@
                 return;
             }
 
-            if (quiz.isEmbed) {
-                display.innerHTML = `<span>${quiz.before}</span><span class="antecedent">${quiz.antecedent}</span><span class="slot-container" id="interactive-container"><div class="slot" id="target-slot">？</div><span class="clause-skeleton">${quiz.clause}</span></span><span>${quiz.after}</span>`;
-            } else {
-                display.innerHTML = `<span>${quiz.before}</span><span class="antecedent">${quiz.antecedent}</span><span class="slot-container" id="interactive-container"><div class="slot" id="target-slot">？</div><span class="clause-skeleton">${quiz.clause}</span></span>`;
+            // 🚀 題型一智慧修復區：過濾重複出現的先行詞
+            if (quiz.type === 1) {
+                let cleanBefore = quiz.before;
+                if (quiz.isEmbed) {
+                    // 檢查 before 結尾是否已經包含 antecedent 內容（不分大小寫、去除前後空白）
+                    let beforeTrim = quiz.before.trim().toLowerCase();
+                    let anteTrim = quiz.antecedent.trim().toLowerCase();
+                    if (beforeTrim.endsWith(anteTrim)) {
+                        // 智慧型將 before 當中重複的單字截斷，只留下前面（例如 "The doctor " 變成 ""）
+                        let lastIndex = quiz.before.toLowerCase().lastIndexOf(anteTrim);
+                        if (lastIndex !== -1) {
+                            cleanBefore = quiz.before.substring(0, lastIndex);
+                        }
+                    }
+                    display.innerHTML = `<span>${cleanBefore}</span><span class="antecedent">${quiz.antecedent}</span><span class="slot-container" id="interactive-container"><div class="slot" id="target-slot">？</div><span class="clause-skeleton">${quiz.clause}</span></span><span>${quiz.after}</span>`;
+                } else {
+                    display.innerHTML = `<span>${quiz.before}</span><span class="antecedent">${quiz.antecedent}</span><span class="slot-container" id="interactive-container"><div class="slot" id="target-slot">？</div><span class="clause-skeleton">${quiz.clause}</span></span>`;
+                }
+                return;
             }
         }
 
