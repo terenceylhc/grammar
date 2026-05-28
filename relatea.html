@@ -63,7 +63,6 @@
     </div>
 
     <div class="main-board" id="board">
-        <!-- ⚙️ 老師勾選設定面板 -->
         <div class="setup-panel" id="setup-ui">
             <h2>⚙️ 課堂競賽設定 (150題 豪華六合一版)</h2>
             <p style="color: #666;">勾選開啟題型，系統會自動從題庫跨單元調配 10 題進行混合大決戰！</p>
@@ -78,7 +77,6 @@
             <button class="btn" id="start-game-btn" style="width: 100%;">🎲 抽出 10 題・開啟多回合跨輪大賽！</button>
         </div>
 
-        <!-- 🎮 競賽進行畫面 -->
         <div class="game-play-ui" id="game-play-ui" style="display:none; width:100%; text-align:center;">
             <div style="font-size: 14pt; color: #888; margin-bottom: 15px;" id="q-progress">題目：0 / 10</div>
             <div id="sentence-display" class="sentence-area"></div>
@@ -93,7 +91,7 @@
     <button class="btn" id="next-btn" style="display:none;">下一題 ➔</button>
 
     <script>
-        // Firebase 串接晶片組設定
+        // Firebase 專利配置晶片組
         const firebaseConfig = {
             apiKey: "AIzaSyDOyninxSDT04q1-L3FPWciybdfnJowIwE",
             authDomain: "fire-gamebase.firebaseapp.com",
@@ -115,10 +113,8 @@
         let globalScores = {}; 
         let isRoundSettled = false; 
 
-        // 初始化資料庫節點
         roomRef.set({ isStarted: false, currentQuestion: 0, answered: false, winner: "", currentAnsStr: "", currentType: 1, optionsStr: "", fullSentenceText: "" });
 
-        // 監聽並啟動遊戲
         document.getElementById('start-game-btn').addEventListener('click', () => {
             const types = [1, 2, 3, 4, 5, 6].map(t => document.getElementById(`type-${t}`).checked);
             let filteredPool = totalPool.filter(q => types[q.type - 1]);
@@ -135,7 +131,6 @@
             renderQuestion(0);
         });
 
-        // 多回合資料同步器
         function syncQuestionToFirebase(idx) {
             isRoundSettled = false;
             const quiz = selectedQuizList[idx];
@@ -154,7 +149,7 @@
             });
         }
 
-        // 大螢幕畫面多功能渲染核心
+        // 大螢幕核心渲染模組 (含重複過濾與句首大寫自動校正)
         function renderQuestion(idx) {
             document.getElementById('winner-banner').style.display = 'none';
             document.getElementById('next-btn').style.display = 'none';
@@ -164,31 +159,26 @@
             const display = document.getElementById('sentence-display');
             display.innerHTML = '';
 
-            // 題型二渲染
             if (quiz.type === 2) { display.innerText = quiz.full; return; }
 
-            // 題型三渲染
             if (quiz.type === 3) {
                 display.innerHTML = `<div style="font-size:18pt; color:#666; margin-bottom:10px;">請合併兩句：${quiz.raw1} / ${quiz.raw2}</div>` + 
                                     `<div style="display:flex; justify-content:center; align-items:center;"><span>${quiz.before}</span><div class="slot-large" id="target-slot">？ 請由平板選取正確子句</div>${quiz.isEmbed ? `<span>${quiz.after}</span>` : ''}</div>`;
                 return;
             }
 
-            // 題型四渲染
             if (quiz.type === 4) {
                 display.innerHTML = `<div style="font-size:18pt; color:#666; margin-bottom:10px;">請重組句子：${quiz.raw1} / ${quiz.raw2}</div>` +
                                     `<div class="slot-large" id="target-slot" style="width:700px; height:80px; border-color:#ffd54f; background:#fffde7; color:#f57f17;">？ 等待學生平板進行語順排列重組</div>`;
                 return;
             }
 
-            // 🌟 題型五渲染：優化畫面操作提示語為「點選填空」
             if (quiz.type === 5) {
                 let renderedText = quiz.before.replace("[ ❓ ]", `<div class="slot-t5" id="target-slot" style="width: 200px; border-color: #ab47bc; background: #f3e5f5; color: #7b1fa2;">❓ 點選填空</div>`);
                 display.innerHTML = `<div style="font-size:16pt; color:#ab47bc; margin-bottom:10px; font-weight:bold;">📝 關係子句簡化為分詞片語：請在平板上點選正確答案！</div>` + `<div>${renderedText}</div>`;
                 return;
             }
 
-            // 🌟 題型六渲染：分詞拼圖重組
             if (quiz.type === 6) {
                 display.innerHTML = `<div style="font-size:16pt; color:#01579b; margin-bottom:10px; font-weight:bold;">🧲 分詞片語簡化任務：請在平板上將打散的分詞磁鐵重組！</div>` + 
                                     `<div style="font-size:18pt; color:#777; margin-bottom:15px; font-style:italic;">原句提示：${quiz.raw1}</div>` +
@@ -196,26 +186,30 @@
                 return;
             }
 
-            // 🚀 題型一智慧修復區：過濾重複出現的先行詞，並完美支援句首首字大寫！
+            // 🚀 題型一終極修復核心：跳脫標籤束縛，無條件自動去重、自動首字大寫！
             if (quiz.type === 1) {
                 let cleanBefore = quiz.before;
                 let finalAntecedent = quiz.antecedent; 
 
-                if (quiz.isEmbed) {
-                    let beforeTrim = quiz.before.trim().toLowerCase();
-                    let anteTrim = quiz.antecedent.trim().toLowerCase();
-                    if (beforeTrim.endsWith(anteTrim)) {
-                        let lastIndex = quiz.before.toLowerCase().lastIndexOf(anteTrim);
-                        if (lastIndex !== -1) {
-                            cleanBefore = quiz.before.substring(0, lastIndex);
-                        }
+                // 智慧比對：只要 before 結尾包含 antecedent（不分大小寫），就切除重複字
+                let beforeTrim = quiz.before.trim().toLowerCase();
+                let anteTrim = quiz.antecedent.trim().toLowerCase();
+                
+                if (beforeTrim.endsWith(anteTrim)) {
+                    let lastIndex = quiz.before.toLowerCase().lastIndexOf(anteTrim);
+                    if (lastIndex !== -1) {
+                        cleanBefore = quiz.before.substring(0, lastIndex);
                     }
-                    
-                    // 🚀 核心大寫解鎖鎖：當 cleanBefore 為空代表 antecedent 被頂替到句首，首字強制轉大寫
-                    if (cleanBefore.trim() === "") {
-                        finalAntecedent = quiz.antecedent.charAt(0).toUpperCase() + quiz.antecedent.slice(1);
-                    }
+                }
+                
+                // 大寫校正防線：只要前面沒字，把先行詞抓出來首字母大寫，並剔除空格
+                if (!cleanBefore || cleanBefore.trim() === "") {
+                    cleanBefore = ""; 
+                    let pureAnte = quiz.antecedent.trim();
+                    finalAntecedent = pureAnte.charAt(0).toUpperCase() + pureAnte.slice(1);
+                }
 
+                if (quiz.after) {
                     display.innerHTML = `<span>${cleanBefore}</span><span class="antecedent">${finalAntecedent}</span><span class="slot-container" id="interactive-container"><div class="slot" id="target-slot">？</div><span class="clause-skeleton">${quiz.clause}</span></span><span>${quiz.after}</span>`;
                 } else {
                     display.innerHTML = `<span>${cleanBefore}</span><span class="antecedent">${finalAntecedent}</span><span class="slot-container" id="interactive-container"><div class="slot" id="target-slot">？</div><span class="clause-skeleton">${quiz.clause}</span></span>`;
@@ -224,7 +218,6 @@
             }
         }
 
-        // 接收學生端答題回傳即時反應監聽
         roomRef.child('students').on('value', (snapshot) => {
             const students = snapshot.val(); if (!students) return;
             updateScoreboard(students);
@@ -264,7 +257,6 @@
             });
         });
 
-        // 噴發彩帶與廣播贏家
         function triggerWinner(winnerName) {
             document.getElementById('winner-banner').innerText = `🏆 搶答成功！恭喜【${winnerName}】獲得 10 分！`;
             document.getElementById('winner-banner').style.display = 'block'; document.getElementById('next-btn').style.display = 'block';
@@ -273,7 +265,6 @@
             confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1 } });
         }
 
-        // 更新計分板
         function updateScoreboard(students) {
             const scZone = document.getElementById('scoreboard-ui'); scZone.innerHTML = '';
             let scores = {}; Object.keys(students).forEach(k => { scores[students[k].name] = students[k].score || 0; });
@@ -285,7 +276,6 @@
             });
         }
 
-        // 下一題切換控制
         document.getElementById('next-btn').addEventListener('click', () => {
             currentIdx++;
             if (currentIdx < selectedQuizList.length) {
@@ -301,7 +291,6 @@
             }
         });
 
-        // 頒獎電子音樂合成器
         function playCheersAudio() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -330,7 +319,6 @@
             roomRef.update({ isStarted: false, isEnded: false, currentQuestion: 0, answered: false, winner: "", currentAnsStr: "", optionsStr: "", fullSentenceText: "" });
         }
 
-        // 終場結算排行榜與無限大拉炮
         function showFinalLeaderboard() {
             document.getElementById('winner-banner').style.display = 'none';
             document.getElementById('next-btn').style.display = 'none';
