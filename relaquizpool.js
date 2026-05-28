@@ -8,7 +8,8 @@ const totalPool = [
     { type: 1, before: "The doctor ", antecedent: "the doctor", after: " was very kind.", clause: "treated my grandfather", ans: ["who", "that"], isEmbed: true },
     { type: 1, before: "They live in a house ", antecedent: "a house", clause: "is over one hundred years old.", ans: ["which", "that"] },
     { type: 1, before: "The singer ", antecedent: "the singer", after: " won the award.", clause: "sang the beautiful song", ans: ["who", "that"], isEmbed: true },
-    { type: 1, before: "He bought a new car ", antecedent: "a car", clause: "runs on electricity.", ans: ["which", "that"] },
+    // ⭕ 修正後：讓 before 結尾與 antecedent 完全一致，大螢幕就會啟動自動去重晶片！
+    { type: 1, before: "He bought a new car ", antecedent: "a new car", clause: "runs on electricity.", ans: ["which", "that"] },
     { type: 1, before: "The teacher ", antecedent: "the teacher", after: " comes from Canada.", clause: "teaches us English", ans: ["who", "that"], isEmbed: true },
     { type: 1, before: "Look at the dog ", antecedent: "the dog", clause: "is barking at the mailman.", ans: ["which", "that"] },
     { type: 1, before: "The woman ", antecedent: "the woman", after: " is a famous lawyer.", clause: "lives next door", ans: ["who", "that"], isEmbed: true },
