@@ -91,7 +91,6 @@
     <button class="btn" id="next-btn" style="display:none;">下一題 ➔</button>
 
     <script>
-        // Firebase 專利配置晶片組
         const firebaseConfig = {
             apiKey: "AIzaSyDOyninxSDT04q1-L3FPWciybdfnJowIwE",
             authDomain: "fire-gamebase.firebaseapp.com",
@@ -129,6 +128,7 @@
             currentIdx = 0;
             syncQuestionToFirebase(0);
             renderQuestion(0);
+            activateSmartListeners(); // 喚醒全新防爆連線監聽器
         });
 
         function syncQuestionToFirebase(idx) {
@@ -149,7 +149,6 @@
             });
         }
 
-        // 大螢幕核心渲染模組 (含重複過濾與句首大寫自動校正)
         function renderQuestion(idx) {
             document.getElementById('winner-banner').style.display = 'none';
             document.getElementById('next-btn').style.display = 'none';
@@ -186,26 +185,16 @@
                 return;
             }
 
-            // 🚀 題型一終極修復核心：跳脫標籤束縛，無條件自動去重、自動首字大寫！
             if (quiz.type === 1) {
-                let cleanBefore = quiz.before;
-                let finalAntecedent = quiz.antecedent; 
-
-                // 智慧比對：只要 before 結尾包含 antecedent（不分大小寫），就切除重複字
-                let beforeTrim = quiz.before.trim().toLowerCase();
-                let anteTrim = quiz.antecedent.trim().toLowerCase();
+                let cleanBefore = quiz.before; let finalAntecedent = quiz.antecedent; 
+                let beforeTrim = quiz.before.trim().toLowerCase(); let anteTrim = quiz.antecedent.trim().toLowerCase();
                 
                 if (beforeTrim.endsWith(anteTrim)) {
                     let lastIndex = quiz.before.toLowerCase().lastIndexOf(anteTrim);
-                    if (lastIndex !== -1) {
-                        cleanBefore = quiz.before.substring(0, lastIndex);
-                    }
+                    if (lastIndex !== -1) { cleanBefore = quiz.before.substring(0, lastIndex); }
                 }
-                
-                // 大寫校正防線：只要前面沒字，把先行詞抓出來首字母大寫，並剔除空格
                 if (!cleanBefore || cleanBefore.trim() === "") {
-                    cleanBefore = ""; 
-                    let pureAnte = quiz.antecedent.trim();
+                    cleanBefore = ""; let pureAnte = quiz.antecedent.trim();
                     finalAntecedent = pureAnte.charAt(0).toUpperCase() + pureAnte.slice(1);
                 }
 
@@ -218,19 +207,28 @@
             }
         }
 
-        roomRef.child('students').on('value', (snapshot) => {
-            const students = snapshot.val(); if (!students) return;
-            updateScoreboard(students);
+        // 🌟 核心抗當機改造：改用 child_changed 單點極速監聽，拒絕整包爆量傳輸！
+        function activateSmartListeners() {
+            const studentsRef = roomRef.child('students');
+            studentsRef.off(); // 清除舊監聽
+            
+            // 監聽單一學生狀態變更
+            studentsRef.on('child_changed', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
 
-            Object.keys(students).forEach(id => {
-                const data = students[id];
+                // 刷新即時計分板
+                globalScores[data.name] = data.score || 0;
+                renderScoreboardUI();
+
+                // 判斷搶答成功
                 if (data.success && selectedQuizList.length > 0 && !isRoundSettled) {
                     isRoundSettled = true; 
                     const quiz = selectedQuizList[currentIdx];
                     const slot = document.getElementById('target-slot');
                     
-                    let currentScore = data.score || 0;
-                    roomRef.child(`students/${id}`).update({ score: currentScore + 10 });
+                    // 單點為贏家加分
+                    snapshot.ref.update({ score: (data.score || 0) + 10 });
 
                     if (quiz.type === 2) {
                         const display = document.getElementById('game-play-ui').querySelector('.sentence-area');
@@ -255,7 +253,26 @@
                     triggerWinner(data.name);
                 }
             });
-        });
+
+            // 處理初次加入或剛進教室的隊伍名冊
+            studentsRef.on('child_added', (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    globalScores[data.name] = data.score || 0;
+                    renderScoreboardUI();
+                }
+            });
+        }
+
+        function renderScoreboardUI() {
+            const scZone = document.getElementById('scoreboard-ui'); scZone.innerHTML = '';
+            let sorted = Object.keys(globalScores).sort((a,b) => globalScores[b] - globalScores[a]);
+            if(sorted.length === 0) return;
+            sorted.forEach((name, i) => {
+                const pill = document.createElement('div'); pill.className = `score-pill ${i === 0 ? 'lead' : ''}`;
+                pill.innerText = `${i === 0 ? '👑 ' : ''}${name}：${globalScores[name]} 分`; scZone.appendChild(pill);
+            });
+        }
 
         function triggerWinner(winnerName) {
             document.getElementById('winner-banner').innerText = `🏆 搶答成功！恭喜【${winnerName}】獲得 10 分！`;
@@ -263,17 +280,6 @@
             roomRef.update({ answered: true, winner: winnerName });
             confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0 } });
             confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1 } });
-        }
-
-        function updateScoreboard(students) {
-            const scZone = document.getElementById('scoreboard-ui'); scZone.innerHTML = '';
-            let scores = {}; Object.keys(students).forEach(k => { scores[students[k].name] = students[k].score || 0; });
-            globalScores = scores; let sorted = Object.keys(scores).sort((a,b) => scores[b] - scores[a]);
-            if(sorted.length === 0) return;
-            sorted.forEach((name, i) => {
-                const pill = document.createElement('div'); pill.className = `score-pill ${i === 0 ? 'lead' : ''}`;
-                pill.innerText = `${i === 0 ? '👑 ' : ''}${name}：${scores[name]} 分`; scZone.appendChild(pill);
-            });
         }
 
         document.getElementById('next-btn').addEventListener('click', () => {
@@ -303,19 +309,13 @@
                         osc.start(); osc.stop(audioCtx.currentTime + 0.4);
                     }, i * 80);
                 }
-                let oscMain = audioCtx.createOscillator(); let gainMain = audioCtx.createGain();
-                oscMain.type = 'sine'; oscMain.frequency.setValueAtTime(600, audioCtx.currentTime);
-                oscMain.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.3);
-                oscMain.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 1.5);
-                gainMain.gain.setValueAtTime(0.2, audioCtx.currentTime); gainMain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.8);
-                oscMain.connect(gainMain); gainMain.connect(audioCtx.destination);
-                oscMain.start(); oscMain.stop(audioCtx.currentTime + 1.8);
-            } catch (e) { console.log(e); }
+            } catch (e) {}
         }
 
         function resetToGameRoom() {
             document.getElementById('game-play-ui').style.display = 'none';
             document.getElementById('setup-ui').style.display = 'block';
+            globalScores = {};
             roomRef.update({ isStarted: false, isEnded: false, currentQuestion: 0, answered: false, winner: "", currentAnsStr: "", optionsStr: "", fullSentenceText: "" });
         }
 
