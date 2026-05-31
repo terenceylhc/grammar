@@ -66,6 +66,7 @@
         let sName = ""; let roomCode = ""; let studentRef = null;
         let currentTypeKey = ""; let sortableInstance = null;
         let targetAnsStr = "";
+        let isAnswerLocked = false; // 🌟 新增：前端防抖防震盪鎖
 
         document.getElementById('join-btn').addEventListener('click', () => {
             roomCode = document.getElementById('room-input').value;
@@ -96,6 +97,7 @@
 
                             if (currentTypeKey !== data.currentQuestion + '_' + data.currentType) {
                                 currentTypeKey = data.currentQuestion + '_' + data.currentType;
+                                isAnswerLocked = false; // 開啟新題目，自動解鎖
                                 setupInterface(data.currentType, data.fullSentenceText, data.optionsStr);
                             }
 
@@ -103,12 +105,13 @@
                                 document.getElementById('pad').style.opacity = "0.5";
                                 document.getElementById('pad').style.pointerEvents = "none";
                                 document.getElementById('submit-t2-btn').disabled = true;
+                                isAnswerLocked = true; // 該回合已結束，全面上鎖
                                 if (data.winner === sName) {
                                     document.getElementById('msg').style.color = '#2e7d32'; document.getElementById('msg').innerText = "❤️ 搶答成功！獲得 10 分！";
                                 } else {
                                     document.getElementById('msg').style.color = '#666'; document.getElementById('msg').innerText = `😱 被【${data.winner}】率先搶答走囉！`;
                                 }
-                            } else {
+                            } else if (!isAnswerLocked) {
                                 document.getElementById('msg').innerText = ""; document.getElementById('submit-t2-btn').disabled = false;
                                 document.getElementById('pad').style.opacity = "1"; document.getElementById('pad').style.pointerEvents = "auto";
                             }
@@ -138,7 +141,7 @@
                 fullText.split(' ').forEach(word => {
                     const token = document.createElement('div'); token.className = 'word-token'; token.innerText = word;
                     token.setAttribute('data-key', word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,""));
-                    token.addEventListener('click', () => { token.classList.toggle('selected'); });
+                    token.addEventListener('click', () => { if(!isAnswerLocked) token.classList.toggle('selected'); });
                     pad.appendChild(token);
                 });
             } else if (type === 3 && optsStr) {
@@ -148,27 +151,28 @@
                     const optBtn = document.createElement('button'); optBtn.className = 'clause-option-btn';
                     optBtn.innerHTML = `📄 <strong>${optText}</strong>`;
                     optBtn.addEventListener('click', () => {
-                        if (optText === targetAnsStr) { studentRef.update({ success: true, card: optText }); } 
-                        else { alertWrong("❌ 結構有文法錯誤喔，再想想看！"); }
+                        if (isAnswerLocked) return;
+                        if (optText === targetAnsStr) { 
+                            isAnswerLocked = true; // 智慧鎖死，防二次震盪寫入
+                            studentRef.update({ success: true, card: optText }); 
+                        } else { 
+                            alertWrong("❌ 結構有文法錯誤喔，再想想看！"); 
+                        }
                     });
                     pad.appendChild(optBtn);
                 });
             } else if (type === 5 && optsStr) {
-                // 🌟 題型五面版：關係子句簡化為分詞片語 - 修正為純字卡按鈕
                 document.getElementById('game-guide').innerText = "⚡ 關係子句簡化為分詞片語：請點選正確的分詞片語！";
                 submitBtn.style.display = 'none';
                 optsStr.split('##').forEach(optText => {
                     const optBtn = document.createElement('button'); optBtn.className = 'clause-option-btn';
-                    optBtn.style.borderColor = "#ab47bc"; 
-                    optBtn.style.textAlign = "center"; // 文字置中更好看
-                    optBtn.style.fontSize = "16pt";    // 放大字體提高點擊舒適度
-                    
-                    // 🚀 修正：移除「分詞簡化發射 ➔」
+                    optBtn.style.borderColor = "#ab47bc"; optBtn.style.textAlign = "center"; optBtn.style.fontSize = "16pt";
                     optBtn.innerHTML = `📄 <strong>${optText}</strong>`;
-                    
                     optBtn.addEventListener('click', () => {
+                        if (isAnswerLocked) return;
                         const pureTarget = targetAnsStr.split(',')[0];
                         if (optText === pureTarget || optText === targetAnsStr) { 
+                            isAnswerLocked = true; 
                             studentRef.update({ success: true, card: optText }); 
                         } else { 
                             alertWrong("❌ 分詞主被動判斷錯誤，請重新校對！"); 
@@ -177,28 +181,19 @@
                     pad.appendChild(optBtn);
                 });
             } else if ((type === 4 || type === 6) && optsStr) {
-                // 🌟 題型六與題型四：全面啟動最高規格 SortableJS 手機觸控引擎
                 if(type === 6) {
                     document.getElementById('game-guide').innerText = "🧲 關係子句簡化為分詞片語：請上下拖曳字塊，排出正確的分詞片語簡化句！";
                 } else {
                     document.getElementById('game-guide').innerText = "🧲 高級排列組合：請上下拖曳字塊，排出正確句子！";
                 }
                 submitBtn.style.display = 'block';
-                
-                const tokens = optsStr.split('##'); 
-                tokens.sort(() => Math.random() - 0.5);
+                const tokens = optsStr.split('##'); tokens.sort(() => Math.random() - 0.5);
                 tokens.forEach(tokText => {
                     const block = document.createElement('div'); block.className = 'sort-token'; block.innerText = tokText;
                     if(type === 6) block.style.background = "#e3f2fd";
                     pad.appendChild(block);
                 });
-                
-                // 🚀 核心修復：強制在軟體層解鎖 HTML5 觸控拖動限制，保證 iPad 與手機 100% 能流暢拉動！
-                sortableInstance = new Sortable(pad, { 
-                    animation: 150,
-                    forceFallback: true,
-                    fallbackTolerance: 3
-                });
+                sortableInstance = new Sortable(pad, { animation: 150, forceFallback: true, fallbackTolerance: 3 });
             } else {
                 document.getElementById('game-guide').innerText = "🚀 請按住關代卡片向上發射至大螢幕！";
                 submitBtn.style.display = 'none';
@@ -210,13 +205,19 @@
         }
 
         document.getElementById('submit-t2-btn').addEventListener('click', () => {
+            if (isAnswerLocked) return;
             if (currentTypeKey.endsWith('_2')) {
                 const selectedKeys = Array.from(document.querySelectorAll('.word-token.selected')).map(t => t.getAttribute('data-key'));
-                if (selectedKeys.join(',') === targetAnsStr) { studentRef.update({ success: true }); } else { alertWrong("❌ 範圍不正確，請重新校對！"); }
+                if (selectedKeys.join(',') === targetAnsStr) { 
+                    isAnswerLocked = true;
+                    studentRef.update({ success: true }); 
+                } else { alertWrong("❌ 範圍不正確，請重新校對！"); }
             } else if (currentTypeKey.endsWith('_4') || currentTypeKey.endsWith('_6')) {
                 const studentOrder = Array.from(document.querySelectorAll('.sort-token')).map(b => b.innerText).join(',');
-                if (targetAnsStr.split('||').includes(studentOrder)) { studentRef.update({ success: true, card: studentOrder }); } 
-                else { alertWrong("❌ 語順不正確，請再調換一下字塊！"); }
+                if (targetAnsStr.split('||').includes(studentOrder)) { 
+                    isAnswerLocked = true;
+                    studentRef.update({ success: true, card: studentOrder }); 
+                } else { alertWrong("❌ 語順不正確，請再調換一下字塊！"); }
             }
         });
 
@@ -230,6 +231,7 @@
             cards.forEach(card => {
                 let isPointerDown = false; let startX = 0, startY = 0, origLeft = 0, origTop = 0;
                 card.addEventListener('pointerdown', (e) => {
+                    if (isAnswerLocked) return;
                     isPointerDown = true; card.setPointerCapture(e.pointerId);
                     if (card.style.position !== 'absolute') {
                         const rect = card.getBoundingClientRect(); const padRect = pad.getBoundingClientRect();
@@ -239,7 +241,7 @@
                     startX = e.clientX; startY = e.clientY;
                 });
                 card.addEventListener('pointermove', (e) => {
-                    if (!isPointerDown) return;
+                    if (!isPointerDown || isAnswerLocked) return;
                     let newX = origLeft + (e.clientX - startX); let newY = origTop + (e.clientY - startY);
                     if(newX < 0) newX = 0; if(newX > pad.clientWidth - card.clientWidth) newX = pad.clientWidth - card.clientWidth;
                     if(newY > pad.clientHeight - card.clientHeight) newY = pad.clientHeight - card.clientHeight;
@@ -247,10 +249,13 @@
                 });
                 card.addEventListener('pointerup', (e) => {
                     if (!isPointerDown) return; isPointerDown = false; card.releasePointerCapture(e.pointerId);
+                    if (isAnswerLocked) { resetCards(); return; }
                     const val = card.getAttribute('data-val');
                     if (parseInt(card.style.top) < 20) {
-                        if (targetAnsStr.split(',').includes(val)) { studentRef.update({ success: true, card: val }); } 
-                        else { alertWrong("❌ 關代選錯囉，請再想想！"); resetCards(); }
+                        if (targetAnsStr.split(',').includes(val)) { 
+                            isAnswerLocked = true;
+                            studentRef.update({ success: true, card: val }); 
+                        } else { alertWrong("❌ 關代選錯囉，請再想想！"); resetCards(); }
                     } else { resetCards(); }
                 });
             });
